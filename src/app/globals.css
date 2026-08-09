@@ -13,21 +13,9 @@
     --accent-red: #EF4444;
   }
 
-  html.dark {
-    --bg-cream: #141416;
-    --bg-card: #1E1E22;
-    --text-main: #FBF7EE;
-    --border-color: #3F3F46;
-    --shadow-color: #000000;
-    --accent-orange: #F97316;
-    --accent-yellow: #CA8A04;
-    --accent-mint: #065F46;
-    --accent-red: #DC2626;
-  }
-
   body {
-    background-color: var(--bg-cream);
-    color: var(--text-main);
+    background-color: #FBF7EE;
+    color: #1C1917;
     font-family: var(--font-inter), system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
     transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
@@ -38,78 +26,21 @@
   }
 }
 
-/* Dark Mode Theme Overrides */
-html.dark body {
-  background-color: #141416;
-  color: #FBF7EE;
-}
-
-html.dark .retro-box {
-  background-color: #1E1E22;
-  border-color: #3F3F46;
-  box-shadow: 3px 3px 0px 0px #000000;
-}
-
-html.dark .retro-box-lg {
-  background-color: #1E1E22;
-  border-color: #3F3F46;
-  box-shadow: 5px 5px 0px 0px #000000;
-}
-
-html.dark .retro-btn {
-  background-color: #F97316;
-  color: #FFFFFF;
-  border-color: #3F3F46;
-  box-shadow: 3px 3px 0px 0px #000000;
-}
-
-html.dark .retro-btn:hover {
-  box-shadow: 4px 4px 0px 0px #000000;
-}
-
-html.dark .retro-btn-secondary {
-  background-color: #27272A;
-  color: #FBF7EE;
-  border-color: #3F3F46;
-  box-shadow: 3px 3px 0px 0px #000000;
-}
-
-html.dark .retro-btn-secondary:hover {
-  background-color: #3F3F46;
-  box-shadow: 4px 4px 0px 0px #000000;
-}
-
-html.dark .retro-btn-danger {
-  background-color: #450A0A;
-  color: #FCA5A5;
-  border-color: #3F3F46;
-  box-shadow: 3px 3px 0px 0px #000000;
-}
-
-html.dark .retro-input {
-  background-color: #1E1E22;
-  border-color: #3F3F46;
-  color: #FBF7EE;
-}
-
-html.dark .retro-input:focus {
-  box-shadow: 3px 3px 0px 0px #F97316;
-  border-color: #FBF7EE;
-}
-
-/* General retro utilities */
+/* General retro utilities (Light Mode Defaults) */
 .retro-box {
   background-color: #FFFDF9;
   border: 2px solid #1C1917;
   box-shadow: 3px 3px 0px 0px #1C1917;
-  transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+  color: #1C1917;
+  transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease, color 250ms ease;
 }
 
 .retro-box-lg {
   background-color: #FFFDF9;
   border: 3px solid #1C1917;
   box-shadow: 5px 5px 0px 0px #1C1917;
-  transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+  color: #1C1917;
+  transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease, color 250ms ease;
 }
 
 .retro-btn {
@@ -218,4 +149,65 @@ html.dark .retro-input:focus {
   background-size: 12px 12px;
   opacity: 0.03;
   pointer-events: none;
+}
+
+/* Dark Mode Theme Overrides (Placed AFTER base classes for proper cascade override) */
+html.dark body {
+  background-color: #141416 !important;
+  color: #FBF7EE !important;
+}
+
+html.dark .retro-box {
+  background-color: #1E1E22 !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+  color: #FBF7EE !important;
+}
+
+html.dark .retro-box-lg {
+  background-color: #1E1E22 !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 5px 5px 0px 0px #000000 !important;
+  color: #FBF7EE !important;
+}
+
+html.dark .retro-btn {
+  background-color: #F97316 !important;
+  color: #FFFFFF !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+html.dark .retro-btn:hover {
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+}
+
+html.dark .retro-btn-secondary {
+  background-color: #27272A !important;
+  color: #FBF7EE !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+html.dark .retro-btn-secondary:hover {
+  background-color: #3F3F46 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+}
+
+html.dark .retro-btn-danger {
+  background-color: #450A0A !important;
+  color: #FCA5A5 !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+html.dark .retro-input {
+  background-color: #1E1E22 !important;
+  border-color: #3F3F46 !important;
+  color: #FBF7EE !important;
+}
+
+html.dark .retro-input:focus {
+  box-shadow: 3px 3px 0px 0px #F97316 !important;
+  border-color: #FBF7EE !important;
 }
