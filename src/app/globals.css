@@ -1,18 +1,8 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --bg-cream: #FBF7EE;
-    --bg-card: #FFFDF9;
-    --text-main: #1C1917;
-    --border-color: #1C1917;
-    --shadow-color: #1C1917;
-    --accent-orange: #EA580C;
-    --accent-yellow: #FEF08A;
-    --accent-mint: #D1FAE5;
-    --accent-red: #EF4444;
-  }
+@variant dark (&:where(.dark, .dark *));
 
+@layer base {
   body {
     background-color: #FBF7EE;
     color: #1C1917;
@@ -26,7 +16,30 @@
   }
 }
 
-/* General retro utilities (Light Mode Defaults) */
+/* ==========================================================================
+   LIGHT MODE DEFAULTS (When html does NOT have .dark class)
+   ========================================================================== */
+
+/* Main Container / Page Background */
+html:not(.dark) body,
+html:not(.dark) main {
+  background-color: #FBF7EE !important;
+  color: #1C1917 !important;
+}
+
+/* Header & Navbar */
+html:not(.dark) header {
+  background-color: #FBF7EE !important;
+  border-color: #1C1917 !important;
+}
+
+/* Bottom Navigation */
+html:not(.dark) .bottom-nav-bg {
+  background-color: #FBF7EE !important;
+  border-color: #1C1917 !important;
+}
+
+/* Retro Box / Cards */
 .retro-box {
   background-color: #FFFDF9;
   border: 2px solid #1C1917;
@@ -43,6 +56,7 @@
   transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease, color 250ms ease;
 }
 
+/* Retro Buttons */
 .retro-btn {
   background-color: #EA580C;
   color: #FFFFFF;
@@ -115,6 +129,7 @@
   box-shadow: 0px 0px 0px 0px #1C1917;
 }
 
+/* Retro Inputs */
 .retro-input {
   background-color: #FFFDF9;
   border: 2px solid #1C1917;
@@ -130,7 +145,6 @@
   transition: border-color 150ms ease, box-shadow 150ms ease, background-color 250ms ease, color 250ms ease;
 }
 
-/* Helper for inputs that contain a left icon */
 .retro-input.pl-10,
 .retro-input.pl-11,
 .retro-input.pl-12,
@@ -151,10 +165,24 @@
   pointer-events: none;
 }
 
-/* Dark Mode Theme Overrides (Placed AFTER base classes for proper cascade override) */
-html.dark body {
+/* ==========================================================================
+   DARK MODE OVERRIDES (Strictly scoped under html.dark)
+   ========================================================================== */
+
+html.dark body,
+html.dark main {
   background-color: #141416 !important;
   color: #FBF7EE !important;
+}
+
+html.dark header {
+  background-color: #141416 !important;
+  border-color: #3F3F46 !important;
+}
+
+html.dark .bottom-nav-bg {
+  background-color: #141416 !important;
+  border-color: #3F3F46 !important;
 }
 
 html.dark .retro-box {

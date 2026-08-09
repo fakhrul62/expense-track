@@ -37,7 +37,7 @@ export default function RootLayout({
       lang="en"
       className={`${spaceMono.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#FBF7EE] dark:bg-[#141416] text-[#1C1917] dark:text-[#FBF7EE] font-sans selection:bg-[#EA580C] selection:text-white transition-colors duration-250">
+      <body className="min-h-full flex flex-col font-sans selection:bg-[#EA580C] selection:text-white transition-colors duration-250">
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
