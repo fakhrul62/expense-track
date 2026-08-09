@@ -1,26 +1,134 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg-cream: #FBF7EE;
+    --bg-card: #FFFDF9;
+    --text-main: #1C1917;
+    --accent-orange: #EA580C;
+    --accent-yellow: #FEF08A;
+    --accent-mint: #D1FAE5;
+    --accent-red: #EF4444;
+  }
+
+  body {
+    background-color: var(--bg-cream);
+    color: var(--text-main);
+    font-family: var(--font-inter), system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-mono-retro {
+    font-family: var(--font-space-mono), monospace;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Retro Shadow and Box Utilities */
+.retro-box {
+  background-color: #FFFDF9;
+  border: 2px solid #1C1917;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+}
+
+.retro-box-lg {
+  background-color: #FFFDF9;
+  border: 3px solid #1C1917;
+  box-shadow: 5px 5px 0px 0px #1C1917;
+}
+
+.retro-btn {
+  background-color: #EA580C;
+  color: #FFFFFF;
+  font-weight: 700;
+  border: 2px solid #1C1917;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.retro-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px 0px #1C1917;
+}
+
+.retro-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #1C1917;
+}
+
+.retro-btn-secondary {
+  background-color: #FFFDF9;
+  color: #1C1917;
+  font-weight: 700;
+  border: 2px solid #1C1917;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.retro-btn-secondary:hover {
+  background-color: #FEF08A;
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px 0px #1C1917;
+}
+
+.retro-btn-secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #1C1917;
+}
+
+.retro-btn-danger {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  font-weight: 700;
+  border: 2px solid #1C1917;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.retro-btn-danger:hover {
+  background-color: #EF4444;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px 0px #1C1917;
+}
+
+.retro-btn-danger:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #1C1917;
+}
+
+.retro-input {
+  background-color: #FFFDF9;
+  border: 2px solid #1C1917;
+  color: #1C1917;
+  min-height: 44px;
+  padding: 8px 14px;
+  width: 100%;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.retro-input:focus {
+  box-shadow: 3px 3px 0px 0px #EA580C;
+  border-color: #1C1917;
+}
+
+/* Custom subtle grain overlay */
+.retro-grain {
+  background-image: radial-gradient(#1c1917 0.75px, transparent 0.75px);
+  background-size: 12px 12px;
+  opacity: 0.03;
+  pointer-events: none;
 }
