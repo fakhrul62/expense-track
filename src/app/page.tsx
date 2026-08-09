@@ -10,13 +10,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
   Calendar,
-  DollarSign,
-  TrendingDown,
   Edit2,
   Trash2,
   ChevronLeft,
   ChevronRight,
-  Filter,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -96,7 +93,6 @@ export default function DashboardPage() {
       groups[e.date].push(e);
     });
 
-    // Sort dates in descending order
     const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
     return sortedDates.map((date) => {
       const dayTotal = groups[date].reduce((sum, item) => sum + item.amount, 0);
@@ -170,8 +166,8 @@ export default function DashboardPage() {
 
   if (authLoading || (!user && !authLoading)) {
     return (
-      <div className="min-h-screen bg-[#FBF7EE] flex items-center justify-center p-4">
-        <div className="retro-box p-6 font-mono-retro text-sm font-bold animate-pulse">
+      <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#141416] flex items-center justify-center p-4">
+        <div className="retro-box p-6 font-mono-retro text-sm font-bold animate-pulse text-[#1C1917] dark:text-[#FBF7EE]">
           LOADING EXPTRACK...
         </div>
       </div>
@@ -179,7 +175,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF7EE] flex flex-col pb-24 md:pb-12">
+    <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#141416] flex flex-col pb-24 md:pb-12 transition-colors duration-250">
       <Navbar onOpenAddExpense={handleOpenAddExpense} />
 
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 space-y-5">
@@ -193,8 +189,8 @@ export default function DashboardPage() {
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2 font-mono-retro font-black text-sm sm:text-base text-[#1C1917]">
-            <Calendar className="w-4 h-4 text-[#EA580C]" />
+          <div className="flex items-center gap-2 font-mono-retro font-black text-sm sm:text-base text-[#1C1917] dark:text-[#FBF7EE]">
+            <Calendar className="w-4 h-4 text-[#EA580C] dark:text-[#F97316]" />
             <span>{formatMonthTitle(selectedMonth)}</span>
           </div>
           <button
@@ -210,21 +206,21 @@ export default function DashboardPage() {
         {/* Totals Section */}
         <section className="grid grid-cols-2 gap-3 sm:gap-4">
           {/* Daily Total Box */}
-          <div className="bg-[#FFFDF9] border-3 border-[#1C1917] shadow-[4px_4px_0px_0px_#1C1917] p-4 flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 right-0 bg-[#FEF08A] border-b-2 border-l-2 border-[#1C1917] px-2 py-0.5 font-mono-retro text-[10px] font-bold">
+          <div className="bg-[#FFFDF9] dark:bg-[#1E1E22] border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[4px_4px_0px_0px_#1C1917] dark:shadow-[4px_4px_0px_0px_#000000] p-4 flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] border-b-2 border-l-2 border-[#1C1917] dark:border-[#3F3F46] px-2 py-0.5 font-mono-retro text-[10px] font-bold">
               TODAY
             </div>
-            <span className="font-mono-retro text-xs text-stone-600 font-bold uppercase tracking-wider mb-2">
+            <span className="font-mono-retro text-xs text-stone-600 dark:text-stone-400 font-bold uppercase tracking-wider mb-2">
               Daily Total
             </span>
-            <div className="font-mono-retro font-black text-xl sm:text-2xl text-[#1C1917] truncate">
+            <div className="font-mono-retro font-black text-xl sm:text-2xl text-[#1C1917] dark:text-[#FBF7EE] truncate">
               ৳ {dailyTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </div>
           </div>
 
           {/* Monthly Total Box */}
-          <div className="bg-[#1C1917] text-white border-3 border-[#1C1917] shadow-[4px_4px_0px_0px_#EA580C] p-4 flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 right-0 bg-[#EA580C] text-white border-b-2 border-l-2 border-[#1C1917] px-2 py-0.5 font-mono-retro text-[10px] font-bold">
+          <div className="bg-[#1C1917] dark:bg-[#27272A] text-white border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[4px_4px_0px_0px_#EA580C] dark:shadow-[4px_4px_0px_0px_#F97316] p-4 flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-[#EA580C] dark:bg-[#F97316] text-white border-b-2 border-l-2 border-[#1C1917] dark:border-[#3F3F46] px-2 py-0.5 font-mono-retro text-[10px] font-bold">
               MONTH
             </div>
             <span className="font-mono-retro text-xs text-amber-200/80 font-bold uppercase tracking-wider mb-2">
@@ -237,19 +233,19 @@ export default function DashboardPage() {
         </section>
 
         {/* Expenses Header & Add trigger */}
-        <div className="flex items-center justify-between border-b-2 border-[#1C1917] pb-2 pt-2">
-          <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] flex items-center gap-2">
-            <span className="bg-[#FEF08A] px-2 py-0.5 border border-[#1C1917]">
+        <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-2 pt-2">
+          <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE] flex items-center gap-2">
+            <span className="bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] px-2 py-0.5 border border-[#1C1917] dark:border-[#3F3F46]">
               TRANSACTIONS
             </span>
-            <span className="text-xs text-stone-500 font-normal">
+            <span className="text-xs text-stone-500 dark:text-stone-400 font-normal">
               ({expenses.length})
             </span>
           </h2>
 
           <button
             onClick={handleOpenAddExpense}
-            className="retro-btn bg-[#EA580C] text-white text-xs px-3 py-1.5 font-mono-retro rounded-none flex items-center gap-1 min-h-[36px]"
+            className="retro-btn bg-[#EA580C] dark:bg-[#F97316] text-white text-xs px-3 py-1.5 font-mono-retro rounded-none flex items-center gap-1 min-h-[36px]"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>EXPENSE</span>
@@ -264,18 +260,18 @@ export default function DashboardPage() {
                 key={i}
                 className="retro-box p-4 animate-pulse flex justify-between items-center"
               >
-                <div className="h-4 bg-stone-200 w-1/3 rounded-none"></div>
-                <div className="h-6 bg-stone-200 w-1/4 rounded-none"></div>
+                <div className="h-4 bg-stone-200 dark:bg-stone-700 w-1/3 rounded-none"></div>
+                <div className="h-6 bg-stone-200 dark:bg-stone-700 w-1/4 rounded-none"></div>
               </div>
             ))}
           </div>
         ) : groupedExpenses.length === 0 ? (
-          <div className="retro-box p-8 text-center space-y-3 bg-[#FFFDF9]">
+          <div className="retro-box p-8 text-center space-y-3 bg-[#FFFDF9] dark:bg-[#1E1E22]">
             <div className="text-4xl">💸</div>
-            <h3 className="font-mono-retro font-bold text-sm text-[#1C1917]">
+            <h3 className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE]">
               NO EXPENSES RECORDED YET
             </h3>
-            <p className="font-mono-retro text-xs text-stone-600 max-w-xs mx-auto">
+            <p className="font-mono-retro text-xs text-stone-600 dark:text-stone-400 max-w-xs mx-auto">
               Tap the button below or top bar to add your first expense for {formatMonthTitle(selectedMonth)}.
             </p>
             <button
@@ -290,11 +286,11 @@ export default function DashboardPage() {
             {groupedExpenses.map((group) => (
               <div key={group.date} className="space-y-2">
                 {/* Date Header with Day Total */}
-                <div className="flex items-center justify-between px-1 font-mono-retro text-xs font-bold text-[#1C1917]">
-                  <span className="bg-[#1C1917] text-white px-2 py-0.5 border border-[#1C1917]">
+                <div className="flex items-center justify-between px-1 font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE]">
+                  <span className="bg-[#1C1917] dark:bg-[#27272A] text-white dark:text-[#FEF08A] px-2 py-0.5 border border-[#1C1917] dark:border-[#3F3F46]">
                     {formatDateHeader(group.date)}
                   </span>
-                  <span className="text-stone-700">
+                  <span className="text-stone-700 dark:text-stone-300">
                     Day Total: ৳{group.dayTotal.toFixed(2)}
                   </span>
                 </div>
@@ -316,21 +312,21 @@ export default function DashboardPage() {
                           initial={{ opacity: 0, y: 5 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, x: -20 }}
-                          className="bg-[#FFFDF9] border-2 border-[#1C1917] shadow-[3px_3px_0px_0px_#1C1917] p-3 flex items-center justify-between gap-3 hover:bg-[#FEF08A]/30 transition-colors"
+                          className="bg-[#FFFDF9] dark:bg-[#1E1E22] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[3px_3px_0px_0px_#1C1917] dark:shadow-[3px_3px_0px_0px_#000000] p-3 flex items-center justify-between gap-3 hover:bg-[#FEF08A]/30 dark:hover:bg-[#3F3F46]/50 transition-colors"
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             {/* Icon badge */}
-                            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center text-xl bg-[#FBF7EE] border-2 border-[#1C1917] shadow-[2px_2px_0px_0px_#1C1917]">
+                            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center text-xl bg-[#FBF7EE] dark:bg-[#141416] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000]">
                               {catIcon}
                             </div>
 
                             {/* Info */}
                             <div className="min-w-0">
-                              <h4 className="font-mono-retro text-xs font-bold text-[#1C1917] truncate">
+                              <h4 className="font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] truncate">
                                 {catName}
                               </h4>
                               {item.note && (
-                                <p className="font-sans text-xs text-stone-600 truncate mt-0.5">
+                                <p className="font-sans text-xs text-stone-600 dark:text-stone-400 truncate mt-0.5">
                                   {item.note}
                                 </p>
                               )}
@@ -339,7 +335,7 @@ export default function DashboardPage() {
 
                           {/* Right: Amount & Actions */}
                           <div className="flex items-center gap-3 flex-shrink-0">
-                            <div className="font-mono-retro font-bold text-sm text-[#1C1917] text-right">
+                            <div className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE] text-right">
                               -৳{item.amount.toFixed(2)}
                             </div>
 
@@ -347,19 +343,19 @@ export default function DashboardPage() {
                             <div className="flex items-center gap-1">
                               <button
                                 onClick={() => handleOpenEditExpense(item)}
-                                className="w-8 h-8 flex items-center justify-center bg-[#FFFDF9] border-2 border-[#1C1917] shadow-[1.5px_1.5px_0px_0px_#1C1917] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-[#FEF08A] transition-all"
+                                className="w-8 h-8 flex items-center justify-center bg-[#FFFDF9] dark:bg-[#27272A] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[1.5px_1.5px_0px_0px_#1C1917] dark:shadow-[1.5px_1.5px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-[#FEF08A] dark:hover:bg-[#3F3F46] transition-all"
                                 title="Edit Expense"
                                 aria-label="Edit Expense"
                               >
-                                <Edit2 className="w-3.5 h-3.5 text-[#1C1917]" />
+                                <Edit2 className="w-3.5 h-3.5 text-[#1C1917] dark:text-[#FBF7EE]" />
                               </button>
                               <button
                                 onClick={() => setDeletingExpenseId(item._id)}
-                                className="w-8 h-8 flex items-center justify-center bg-[#FEE2E2] border-2 border-[#1C1917] shadow-[1.5px_1.5px_0px_0px_#1C1917] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-[#EF4444] hover:text-white transition-all group"
+                                className="w-8 h-8 flex items-center justify-center bg-[#FEE2E2] dark:bg-[#450A0A] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[1.5px_1.5px_0px_0px_#1C1917] dark:shadow-[1.5px_1.5px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-[#EF4444] hover:text-white transition-all group"
                                 title="Delete Expense"
                                 aria-label="Delete Expense"
                               >
-                                <Trash2 className="w-3.5 h-3.5 text-[#991B1B] group-hover:text-white" />
+                                <Trash2 className="w-3.5 h-3.5 text-[#991B1B] dark:text-[#FCA5A5] group-hover:text-white" />
                               </button>
                             </div>
                           </div>

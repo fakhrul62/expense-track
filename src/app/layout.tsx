@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const spaceMono = Space_Mono({
   weight: ["400", "700"],
@@ -36,8 +37,10 @@ export default function RootLayout({
       lang="en"
       className={`${spaceMono.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#FBF7EE] text-[#1C1917] font-sans selection:bg-[#EA580C] selection:text-white">
-        <AuthProvider>{children}</AuthProvider>
+      <body className="min-h-full flex flex-col bg-[#FBF7EE] dark:bg-[#141416] text-[#1C1917] dark:text-[#FBF7EE] font-sans selection:bg-[#EA580C] selection:text-white transition-colors duration-250">
+        <ThemeProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

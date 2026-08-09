@@ -5,10 +5,24 @@
     --bg-cream: #FBF7EE;
     --bg-card: #FFFDF9;
     --text-main: #1C1917;
+    --border-color: #1C1917;
+    --shadow-color: #1C1917;
     --accent-orange: #EA580C;
     --accent-yellow: #FEF08A;
     --accent-mint: #D1FAE5;
     --accent-red: #EF4444;
+  }
+
+  html.dark {
+    --bg-cream: #141416;
+    --bg-card: #1E1E22;
+    --text-main: #FBF7EE;
+    --border-color: #3F3F46;
+    --shadow-color: #000000;
+    --accent-orange: #F97316;
+    --accent-yellow: #CA8A04;
+    --accent-mint: #065F46;
+    --accent-red: #DC2626;
   }
 
   body {
@@ -16,6 +30,7 @@
     color: var(--text-main);
     font-family: var(--font-inter), system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
+    transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
   }
 
   h1, h2, h3, h4, h5, h6, .font-mono-retro {
@@ -23,17 +38,78 @@
   }
 }
 
-/* Retro Shadow and Box Utilities */
+/* Dark Mode Theme Overrides */
+html.dark body {
+  background-color: #141416;
+  color: #FBF7EE;
+}
+
+html.dark .retro-box {
+  background-color: #1E1E22;
+  border-color: #3F3F46;
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+html.dark .retro-box-lg {
+  background-color: #1E1E22;
+  border-color: #3F3F46;
+  box-shadow: 5px 5px 0px 0px #000000;
+}
+
+html.dark .retro-btn {
+  background-color: #F97316;
+  color: #FFFFFF;
+  border-color: #3F3F46;
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+html.dark .retro-btn:hover {
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+html.dark .retro-btn-secondary {
+  background-color: #27272A;
+  color: #FBF7EE;
+  border-color: #3F3F46;
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+html.dark .retro-btn-secondary:hover {
+  background-color: #3F3F46;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+html.dark .retro-btn-danger {
+  background-color: #450A0A;
+  color: #FCA5A5;
+  border-color: #3F3F46;
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+html.dark .retro-input {
+  background-color: #1E1E22;
+  border-color: #3F3F46;
+  color: #FBF7EE;
+}
+
+html.dark .retro-input:focus {
+  box-shadow: 3px 3px 0px 0px #F97316;
+  border-color: #FBF7EE;
+}
+
+/* General retro utilities */
 .retro-box {
   background-color: #FFFDF9;
   border: 2px solid #1C1917;
   box-shadow: 3px 3px 0px 0px #1C1917;
+  transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
 }
 
 .retro-box-lg {
   background-color: #FFFDF9;
   border: 3px solid #1C1917;
   box-shadow: 5px 5px 0px 0px #1C1917;
+  transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
 }
 
 .retro-btn {
@@ -120,7 +196,7 @@
   width: 100%;
   font-family: inherit;
   outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 250ms ease, color 250ms ease;
 }
 
 /* Helper for inputs that contain a left icon */

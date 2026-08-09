@@ -2,16 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import CategoryModal from "@/components/CategoryModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import ExpenseModal, { CategoryType } from "@/components/ExpenseModal";
-import { User, Mail, Plus, Trash2, ShieldCheck, LogOut, ArrowLeft } from "lucide-react";
+import { User, Plus, Trash2, ShieldCheck, LogOut, ArrowLeft, Sun, Moon } from "lucide-react";
 import Link from "next/link";
 
 export default function SettingsPage() {
   const { user, logout, loading: authLoading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState<boolean>(false);
@@ -78,7 +80,7 @@ export default function SettingsPage() {
 
   if (authLoading || (!user && !authLoading)) {
     return (
-      <div className="min-h-screen bg-[#FBF7EE] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#141416] flex items-center justify-center p-4">
         <div className="retro-box p-6 font-mono-retro text-sm font-bold animate-pulse">
           LOADING SETTINGS...
         </div>
@@ -87,7 +89,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF7EE] flex flex-col pb-24 md:pb-12">
+    <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#141416] flex flex-col pb-24 md:pb-12 transition-colors duration-250">
       <Navbar onOpenAddExpense={() => setIsExpenseModalOpen(true)} />
 
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 space-y-6">
@@ -100,22 +102,62 @@ export default function SettingsPage() {
             <ArrowLeft className="w-4 h-4" /> BACK TO EXPENSES
           </Link>
 
-          <span className="font-mono-retro font-bold text-xs bg-[#FEF08A] px-2 py-1 border border-[#1C1917]">
+          <span className="font-mono-retro font-bold text-xs bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] px-2 py-1 border border-[#1C1917] dark:border-[#3F3F46]">
             SETTINGS & CONFIG
           </span>
         </div>
 
         {error && (
-          <div className="bg-[#FEE2E2] border-2 border-[#1C1917] p-3 font-mono-retro text-xs text-[#991B1B]">
+          <div className="bg-[#FEE2E2] dark:bg-[#450A0A] border-2 border-[#1C1917] dark:border-[#3F3F46] p-3 font-mono-retro text-xs text-[#991B1B] dark:text-[#FCA5A5]">
             ⚠️ {error}
           </div>
         )}
 
+        {/* Theme Settings Section */}
+        <section className="bg-[#FFFDF9] dark:bg-[#1E1E22] border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[5px_5px_0px_0px_#1C1917] dark:shadow-[5px_5px_0px_0px_#000000] p-5 space-y-4">
+          <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3">
+            <div>
+              <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE] uppercase">
+                App Theme
+              </h2>
+              <p className="font-mono-retro text-[11px] text-stone-600 dark:text-stone-400 mt-0.5">
+                Toggle between Light Cream &amp; Dark Retro mode
+              </p>
+            </div>
+            <span className="bg-[#FEF08A] dark:bg-[#F97316] text-[#1C1917] dark:text-white border border-[#1C1917] text-[10px] font-mono-retro font-bold px-2 py-0.5 uppercase">
+              {theme} MODE
+            </span>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => theme !== "light" && toggleTheme()}
+              className={`flex-1 py-3 px-4 font-mono-retro text-xs font-bold border-2 flex items-center justify-center gap-2 transition-all duration-150 ${
+                theme === "light"
+                  ? "bg-[#FEF08A] text-[#1C1917] border-[#1C1917] shadow-[3px_3px_0px_0px_#1C1917]"
+                  : "bg-[#27272A] text-stone-400 border-[#3F3F46] hover:bg-[#3F3F46]"
+              }`}
+            >
+              <Sun className="w-4 h-4" /> LIGHT MODE
+            </button>
+            <button
+              onClick={() => theme !== "dark" && toggleTheme()}
+              className={`flex-1 py-3 px-4 font-mono-retro text-xs font-bold border-2 flex items-center justify-center gap-2 transition-all duration-150 ${
+                theme === "dark"
+                  ? "bg-[#F97316] text-white border-[#3F3F46] shadow-[3px_3px_0px_0px_#000000]"
+                  : "bg-[#FFFDF9] text-stone-600 border-[#1C1917] hover:bg-[#FEF08A]"
+              }`}
+            >
+              <Moon className="w-4 h-4" /> DARK MODE
+            </button>
+          </div>
+        </section>
+
         {/* User Account Info */}
-        <section className="bg-[#FFFDF9] border-3 border-[#1C1917] shadow-[5px_5px_0px_0px_#1C1917] p-5 space-y-4">
-          <div className="flex items-center justify-between border-b-2 border-[#1C1917] pb-3">
-            <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] flex items-center gap-2">
-              <User className="w-4 h-4 text-[#EA580C]" />
+        <section className="bg-[#FFFDF9] dark:bg-[#1E1E22] border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[5px_5px_0px_0px_#1C1917] dark:shadow-[5px_5px_0px_0px_#000000] p-5 space-y-4">
+          <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3">
+            <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE] flex items-center gap-2">
+              <User className="w-4 h-4 text-[#EA580C] dark:text-[#F97316]" />
               <span>USER PROFILE</span>
             </h2>
             <span className="bg-[#D1FAE5] text-[#065F46] border border-[#1C1917] text-[10px] font-mono-retro font-bold px-2 py-0.5">
@@ -124,14 +166,14 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-3 font-mono-retro text-xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-[#FBF7EE] border-2 border-[#1C1917]">
-              <span className="text-stone-500">NAME:</span>
-              <span className="font-bold text-[#1C1917]">{user?.name}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-[#FBF7EE] dark:bg-[#141416] border-2 border-[#1C1917] dark:border-[#3F3F46]">
+              <span className="text-stone-500 dark:text-stone-400">NAME:</span>
+              <span className="font-bold text-[#1C1917] dark:text-[#FBF7EE]">{user?.name}</span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-[#FBF7EE] border-2 border-[#1C1917]">
-              <span className="text-stone-500">EMAIL:</span>
-              <span className="font-bold text-[#1C1917]">{user?.email}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-[#FBF7EE] dark:bg-[#141416] border-2 border-[#1C1917] dark:border-[#3F3F46]">
+              <span className="text-stone-500 dark:text-stone-400">EMAIL:</span>
+              <span className="font-bold text-[#1C1917] dark:text-[#FBF7EE]">{user?.email}</span>
             </div>
           </div>
 
@@ -144,13 +186,13 @@ export default function SettingsPage() {
         </section>
 
         {/* Category Management */}
-        <section className="bg-[#FFFDF9] border-3 border-[#1C1917] shadow-[5px_5px_0px_0px_#1C1917] p-5 space-y-4">
-          <div className="flex items-center justify-between border-b-2 border-[#1C1917] pb-3">
+        <section className="bg-[#FFFDF9] dark:bg-[#1E1E22] border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[5px_5px_0px_0px_#1C1917] dark:shadow-[5px_5px_0px_0px_#000000] p-5 space-y-4">
+          <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3">
             <div>
-              <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] uppercase">
+              <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE] uppercase">
                 Expense Categories
               </h2>
-              <p className="font-mono-retro text-[11px] text-stone-600 mt-0.5">
+              <p className="font-mono-retro text-[11px] text-stone-600 dark:text-stone-400 mt-0.5">
                 Manage default &amp; custom categories
               </p>
             </div>
@@ -173,15 +215,15 @@ export default function SettingsPage() {
               {categories.map((cat) => (
                 <div
                   key={cat._id}
-                  className="p-3 border-2 border-[#1C1917] bg-[#FBF7EE] shadow-[2px_2px_0px_0px_#1C1917] flex items-center justify-between gap-2"
+                  className="p-3 border-2 border-[#1C1917] dark:border-[#3F3F46] bg-[#FBF7EE] dark:bg-[#141416] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-between gap-2"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="text-xl flex-shrink-0">{cat.icon}</span>
                     <div className="min-w-0">
-                      <span className="font-mono-retro font-bold text-xs text-[#1C1917] truncate block">
+                      <span className="font-mono-retro font-bold text-xs text-[#1C1917] dark:text-[#FBF7EE] truncate block">
                         {cat.name}
                       </span>
-                      <span className="text-[10px] font-mono-retro text-stone-500 uppercase">
+                      <span className="text-[10px] font-mono-retro text-stone-500 dark:text-stone-400 uppercase">
                         {cat.isDefault ? "Default Category" : "Custom Category"}
                       </span>
                     </div>
@@ -190,18 +232,18 @@ export default function SettingsPage() {
                   {cat.isDefault ? (
                     <span
                       title="Default category cannot be deleted"
-                      className="px-2 py-0.5 bg-[#FEF08A] text-[#1C1917] border border-[#1C1917] font-mono-retro text-[10px] font-bold flex-shrink-0 flex items-center gap-1"
+                      className="px-2 py-0.5 bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] border border-[#1C1917] dark:border-[#3F3F46] font-mono-retro text-[10px] font-bold flex-shrink-0 flex items-center gap-1"
                     >
-                      <ShieldCheck className="w-3 h-3 text-[#EA580C]" /> DEFAULT
+                      <ShieldCheck className="w-3 h-3 text-[#EA580C] dark:text-[#F97316]" /> DEFAULT
                     </span>
                   ) : (
                     <button
                       onClick={() => confirmDeleteCategory(cat)}
-                      className="w-7 h-7 flex-shrink-0 flex items-center justify-center bg-[#FEE2E2] border-2 border-[#1C1917] shadow-[1px_1px_0px_0px_#1C1917] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-[#EF4444] hover:text-white transition-all group"
+                      className="w-7 h-7 flex-shrink-0 flex items-center justify-center bg-[#FEE2E2] dark:bg-[#450A0A] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[1px_1px_0px_0px_#1C1917] dark:shadow-[1px_1px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-[#EF4444] hover:text-white transition-all group"
                       title={`Delete ${cat.name}`}
                       aria-label={`Delete ${cat.name}`}
                     >
-                      <Trash2 className="w-3.5 h-3.5 text-[#991B1B] group-hover:text-white" />
+                      <Trash2 className="w-3.5 h-3.5 text-[#991B1B] dark:text-[#FCA5A5] group-hover:text-white" />
                     </button>
                   )}
                 </div>
@@ -235,9 +277,7 @@ export default function SettingsPage() {
       <ExpenseModal
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
-        onSuccess={() => {
-          // If on settings page, switch to dashboard or refresh
-        }}
+        onSuccess={() => {}}
         categories={categories}
       />
     </div>

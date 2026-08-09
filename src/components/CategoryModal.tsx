@@ -74,25 +74,25 @@ export default function CategoryModal({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="w-full max-w-md bg-[#FFFDF9] border-t-3 sm:border-3 border-[#1C1917] shadow-[6px_6px_0px_0px_#1C1917] p-5 sm:p-6"
+          className="w-full max-w-md bg-[#FFFDF9] dark:bg-[#1E1E22] border-t-3 sm:border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[6px_6px_0px_0px_#1C1917] dark:shadow-[6px_6px_0px_0px_#000000] p-5 sm:p-6"
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b-2 border-[#1C1917] pb-3 mb-4">
-            <h2 className="font-mono-retro font-bold text-base text-[#1C1917] flex items-center gap-2">
-              <span className="bg-[#FEF08A] px-2 py-0.5 border border-[#1C1917]">
+          <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3 mb-4">
+            <h2 className="font-mono-retro font-bold text-base text-[#1C1917] dark:text-[#FBF7EE] flex items-center gap-2">
+              <span className="bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] px-2 py-0.5 border border-[#1C1917] dark:border-[#3F3F46]">
                 + NEW CATEGORY
               </span>
             </h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center bg-[#FFFDF9] border-2 border-[#1C1917] shadow-[2px_2px_0px_0px_#1C1917] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
+              className="w-8 h-8 flex items-center justify-center bg-[#FFFDF9] dark:bg-[#27272A] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
             >
-              <X className="w-5 h-5 text-[#1C1917]" />
+              <X className="w-5 h-5 text-[#1C1917] dark:text-[#FBF7EE]" />
             </button>
           </div>
 
           {error && (
-            <div className="bg-[#FEE2E2] border-2 border-[#1C1917] p-3 mb-4 font-mono-retro text-xs text-[#991B1B]">
+            <div className="bg-[#FEE2E2] dark:bg-[#450A0A] border-2 border-[#1C1917] dark:border-[#3F3F46] p-3 mb-4 font-mono-retro text-xs text-[#991B1B] dark:text-[#FCA5A5]">
               ⚠️ {error}
             </div>
           )}
@@ -100,11 +100,11 @@ export default function CategoryModal({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Category Name */}
             <div>
-              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] mb-1.5 uppercase">
+              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] mb-1.5 uppercase">
                 Category Name *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#1C1917]">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] dark:text-[#FBF7EE] z-10">
                   <Tag className="w-4 h-4" />
                 </div>
                 <input
@@ -113,7 +113,7 @@ export default function CategoryModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="retro-input pl-10 text-sm font-mono-retro font-bold"
+                  className="retro-input retro-input-icon text-sm font-mono-retro font-bold"
                   autoFocus
                 />
               </div>
@@ -121,11 +121,11 @@ export default function CategoryModal({
 
             {/* Icon / Emoji Selection */}
             <div>
-              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] mb-1.5 uppercase">
+              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] mb-1.5 uppercase">
                 Icon / Emoji
               </label>
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-12 h-12 flex items-center justify-center text-2xl bg-[#FEF08A] border-2 border-[#1C1917] shadow-[2px_2px_0px_0px_#1C1917]">
+                <div className="w-12 h-12 flex items-center justify-center text-2xl bg-[#FEF08A] dark:bg-[#854D0E] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000]">
                   {icon || "🏷️"}
                 </div>
                 <input
@@ -137,7 +137,7 @@ export default function CategoryModal({
                   className="retro-input text-center text-xl w-24 font-mono-retro"
                 />
               </div>
-              <div className="grid grid-cols-8 gap-1.5 p-2 border-2 border-[#1C1917] bg-[#FBF7EE]">
+              <div className="grid grid-cols-8 gap-1.5 p-2 border-2 border-[#1C1917] dark:border-[#3F3F46] bg-[#FBF7EE] dark:bg-[#141416]">
                 {PRESET_EMOJIS.map((eItem) => (
                   <button
                     key={eItem}
@@ -145,8 +145,8 @@ export default function CategoryModal({
                     onClick={() => setIcon(eItem)}
                     className={`w-8 h-8 text-lg flex items-center justify-center border transition-all ${
                       icon === eItem
-                        ? "bg-[#EA580C] border-[#1C1917]"
-                        : "bg-[#FFFDF9] border-stone-300 hover:bg-[#FEF08A]"
+                        ? "bg-[#EA580C] dark:bg-[#F97316] border-[#1C1917] dark:border-[#3F3F46]"
+                        : "bg-[#FFFDF9] dark:bg-[#1E1E22] border-stone-300 dark:border-stone-700 hover:bg-[#FEF08A] dark:hover:bg-[#3F3F46]"
                     }`}
                   >
                     {eItem}

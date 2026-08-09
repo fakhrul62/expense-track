@@ -126,25 +126,25 @@ export default function ExpenseModal({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="w-full max-w-lg bg-[#FFFDF9] border-t-3 sm:border-3 border-[#1C1917] shadow-[6px_6px_0px_0px_#1C1917] p-5 sm:p-6 max-h-[90vh] overflow-y-auto"
+          className="w-full max-w-lg bg-[#FFFDF9] dark:bg-[#1E1E22] border-t-3 sm:border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[6px_6px_0px_0px_#1C1917] dark:shadow-[6px_6px_0px_0px_#000000] p-5 sm:p-6 max-h-[90vh] overflow-y-auto"
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b-2 border-[#1C1917] pb-3 mb-5">
-            <h2 className="font-mono-retro font-bold text-lg text-[#1C1917] flex items-center gap-2">
-              <span className="bg-[#FEF08A] px-2 py-0.5 border border-[#1C1917]">
+          <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3 mb-5">
+            <h2 className="font-mono-retro font-bold text-lg text-[#1C1917] dark:text-[#FBF7EE] flex items-center gap-2">
+              <span className="bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] px-2 py-0.5 border border-[#1C1917] dark:border-[#3F3F46]">
                 {editingExpense ? "EDIT EXPENSE" : "+ NEW EXPENSE"}
               </span>
             </h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center bg-[#FFFDF9] border-2 border-[#1C1917] shadow-[2px_2px_0px_0px_#1C1917] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
+              className="w-8 h-8 flex items-center justify-center bg-[#FFFDF9] dark:bg-[#27272A] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
             >
-              <X className="w-5 h-5 text-[#1C1917]" />
+              <X className="w-5 h-5 text-[#1C1917] dark:text-[#FBF7EE]" />
             </button>
           </div>
 
           {error && (
-            <div className="bg-[#FEE2E2] border-2 border-[#1C1917] p-3 mb-4 font-mono-retro text-xs text-[#991B1B]">
+            <div className="bg-[#FEE2E2] dark:bg-[#450A0A] border-2 border-[#1C1917] dark:border-[#3F3F46] p-3 mb-4 font-mono-retro text-xs text-[#991B1B] dark:text-[#FCA5A5]">
               ⚠️ {error}
             </div>
           )}
@@ -152,11 +152,11 @@ export default function ExpenseModal({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Amount */}
             <div>
-              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] mb-1.5 uppercase">
+              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] mb-1.5 uppercase">
                 Amount (৳ / $) *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] z-10">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] dark:text-[#FBF7EE] z-10">
                   <DollarSign className="w-5 h-5" />
                 </div>
                 <input
@@ -174,10 +174,10 @@ export default function ExpenseModal({
 
             {/* Category Selector */}
             <div>
-              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] mb-1.5 uppercase">
+              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] mb-1.5 uppercase">
                 Category *
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-36 overflow-y-auto p-1 border-2 border-[#1C1917] bg-[#FBF7EE]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-36 overflow-y-auto p-1 border-2 border-[#1C1917] dark:border-[#3F3F46] bg-[#FBF7EE] dark:bg-[#141416]">
                 {categories.map((cat) => {
                   const isSelected = categoryId === cat._id;
                   return (
@@ -187,8 +187,8 @@ export default function ExpenseModal({
                       onClick={() => setCategoryId(cat._id)}
                       className={`flex flex-col items-center justify-center p-2.5 min-h-[52px] border-2 transition-all duration-150 ${
                         isSelected
-                          ? "bg-[#EA580C] text-white border-[#1C1917] shadow-[2px_2px_0px_0px_#1C1917]"
-                          : "bg-[#FFFDF9] text-[#1C1917] border-[#1C1917] hover:bg-[#FEF08A]"
+                          ? "bg-[#EA580C] dark:bg-[#F97316] text-white border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000]"
+                          : "bg-[#FFFDF9] dark:bg-[#1E1E22] text-[#1C1917] dark:text-[#FBF7EE] border-[#1C1917] dark:border-[#3F3F46] hover:bg-[#FEF08A] dark:hover:bg-[#3F3F46]"
                       }`}
                     >
                       <span className="text-xl mb-0.5">{cat.icon}</span>
@@ -203,11 +203,11 @@ export default function ExpenseModal({
 
             {/* Date */}
             <div>
-              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] mb-1.5 uppercase">
+              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] mb-1.5 uppercase">
                 Date *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] z-10">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] dark:text-[#FBF7EE] z-10">
                   <Calendar className="w-4 h-4" />
                 </div>
                 <input
@@ -222,11 +222,11 @@ export default function ExpenseModal({
 
             {/* Note */}
             <div>
-              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] mb-1.5 uppercase">
+              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] mb-1.5 uppercase">
                 Note (Optional)
               </label>
               <div className="relative">
-                <div className="absolute top-3.5 left-3.5 pointer-events-none text-[#1C1917] z-10">
+                <div className="absolute top-3.5 left-3.5 pointer-events-none text-[#1C1917] dark:text-[#FBF7EE] z-10">
                   <FileText className="w-4 h-4" />
                 </div>
                 <input
