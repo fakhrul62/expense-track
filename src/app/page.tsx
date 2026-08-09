@@ -175,10 +175,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pb-24 md:pb-12 transition-colors duration-250">
+    <div className="min-h-screen flex flex-col pb-36 md:pb-12 transition-colors duration-250">
       <Navbar onOpenAddExpense={handleOpenAddExpense} />
 
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 space-y-5">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 pb-12 space-y-5">
         {/* Month Selector Bar */}
         <section className="retro-box p-3 flex items-center justify-between">
           <button

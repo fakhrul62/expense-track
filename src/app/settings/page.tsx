@@ -80,7 +80,7 @@ export default function SettingsPage() {
 
   if (authLoading || (!user && !authLoading)) {
     return (
-      <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#141416] flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="retro-box p-6 font-mono-retro text-sm font-bold animate-pulse">
           LOADING SETTINGS...
         </div>
@@ -89,10 +89,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#141416] flex flex-col pb-24 md:pb-12 transition-colors duration-250">
+    <div className="min-h-screen flex flex-col pb-36 md:pb-12 transition-colors duration-250">
       <Navbar onOpenAddExpense={() => setIsExpenseModalOpen(true)} />
 
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 space-y-6">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 pb-12 space-y-6">
         {/* Navigation back */}
         <div className="flex items-center justify-between">
           <Link
@@ -114,13 +114,13 @@ export default function SettingsPage() {
         )}
 
         {/* Theme Settings Section */}
-        <section className="bg-[#FFFDF9] dark:bg-[#1E1E22] border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[5px_5px_0px_0px_#1C1917] dark:shadow-[5px_5px_0px_0px_#000000] p-5 space-y-4">
+        <section className="retro-box-lg p-5 space-y-4">
           <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3">
             <div>
-              <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE] uppercase">
+              <h2 className="font-mono-retro font-bold text-sm uppercase">
                 App Theme
               </h2>
-              <p className="font-mono-retro text-[11px] text-stone-600 dark:text-stone-400 mt-0.5">
+              <p className="font-mono-retro text-[11px] opacity-75 mt-0.5">
                 Toggle between Light Cream &amp; Dark Retro mode
               </p>
             </div>
@@ -154,9 +154,9 @@ export default function SettingsPage() {
         </section>
 
         {/* User Account Info */}
-        <section className="bg-[#FFFDF9] dark:bg-[#1E1E22] border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[5px_5px_0px_0px_#1C1917] dark:shadow-[5px_5px_0px_0px_#000000] p-5 space-y-4">
+        <section className="retro-box-lg p-5 space-y-4">
           <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3">
-            <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE] flex items-center gap-2">
+            <h2 className="font-mono-retro font-bold text-sm flex items-center gap-2">
               <User className="w-4 h-4 text-[#EA580C] dark:text-[#F97316]" />
               <span>USER PROFILE</span>
             </h2>
@@ -167,13 +167,13 @@ export default function SettingsPage() {
 
           <div className="space-y-3 font-mono-retro text-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-[#FBF7EE] dark:bg-[#141416] border-2 border-[#1C1917] dark:border-[#3F3F46]">
-              <span className="text-stone-500 dark:text-stone-400">NAME:</span>
-              <span className="font-bold text-[#1C1917] dark:text-[#FBF7EE]">{user?.name}</span>
+              <span className="opacity-75">NAME:</span>
+              <span className="font-bold">{user?.name}</span>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-[#FBF7EE] dark:bg-[#141416] border-2 border-[#1C1917] dark:border-[#3F3F46]">
-              <span className="text-stone-500 dark:text-stone-400">EMAIL:</span>
-              <span className="font-bold text-[#1C1917] dark:text-[#FBF7EE]">{user?.email}</span>
+              <span className="opacity-75">EMAIL:</span>
+              <span className="font-bold">{user?.email}</span>
             </div>
           </div>
 
@@ -186,13 +186,13 @@ export default function SettingsPage() {
         </section>
 
         {/* Category Management */}
-        <section className="bg-[#FFFDF9] dark:bg-[#1E1E22] border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[5px_5px_0px_0px_#1C1917] dark:shadow-[5px_5px_0px_0px_#000000] p-5 space-y-4">
+        <section className="retro-box-lg p-5 space-y-4">
           <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3">
             <div>
-              <h2 className="font-mono-retro font-bold text-sm text-[#1C1917] dark:text-[#FBF7EE] uppercase">
+              <h2 className="font-mono-retro font-bold text-sm uppercase">
                 Expense Categories
               </h2>
-              <p className="font-mono-retro text-[11px] text-stone-600 dark:text-stone-400 mt-0.5">
+              <p className="font-mono-retro text-[11px] opacity-75 mt-0.5">
                 Manage default &amp; custom categories
               </p>
             </div>
@@ -220,10 +220,10 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="text-xl flex-shrink-0">{cat.icon}</span>
                     <div className="min-w-0">
-                      <span className="font-mono-retro font-bold text-xs text-[#1C1917] dark:text-[#FBF7EE] truncate block">
+                      <span className="font-mono-retro font-bold text-xs truncate block">
                         {cat.name}
                       </span>
-                      <span className="text-[10px] font-mono-retro text-stone-500 dark:text-stone-400 uppercase">
+                      <span className="text-[10px] font-mono-retro opacity-75 uppercase">
                         {cat.isDefault ? "Default Category" : "Custom Category"}
                       </span>
                     </div>
@@ -239,11 +239,11 @@ export default function SettingsPage() {
                   ) : (
                     <button
                       onClick={() => confirmDeleteCategory(cat)}
-                      className="w-7 h-7 flex-shrink-0 flex items-center justify-center bg-[#FEE2E2] dark:bg-[#450A0A] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[1px_1px_0px_0px_#1C1917] dark:shadow-[1px_1px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-[#EF4444] hover:text-white transition-all group"
+                      className="retro-btn-danger w-7 h-7 p-0 min-h-[28px] min-w-[28px] flex items-center justify-center"
                       title={`Delete ${cat.name}`}
                       aria-label={`Delete ${cat.name}`}
                     >
-                      <Trash2 className="w-3.5 h-3.5 text-[#991B1B] dark:text-[#FCA5A5] group-hover:text-white" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
