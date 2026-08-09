@@ -113,11 +113,22 @@
   border: 2px solid #1C1917;
   color: #1C1917;
   min-height: 44px;
-  padding: 8px 14px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 14px;
+  padding-right: 14px;
   width: 100%;
   font-family: inherit;
   outline: none;
   transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+/* Helper for inputs that contain a left icon */
+.retro-input.pl-10,
+.retro-input.pl-11,
+.retro-input.pl-12,
+.retro-input-icon {
+  padding-left: 44px !important;
 }
 
 .retro-input:focus {

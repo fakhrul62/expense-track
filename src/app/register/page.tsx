@@ -71,7 +71,7 @@ export default function RegisterPage() {
               Full Name
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#1C1917]">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] z-10">
                 <UserIcon className="w-4 h-4" />
               </div>
               <input
@@ -80,7 +80,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="retro-input pl-10 text-sm font-mono-retro"
+                className="retro-input retro-input-icon text-sm font-mono-retro"
               />
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function RegisterPage() {
               Email Address
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#1C1917]">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] z-10">
                 <Mail className="w-4 h-4" />
               </div>
               <input
@@ -100,7 +100,7 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="retro-input pl-10 text-sm font-mono-retro"
+                className="retro-input retro-input-icon text-sm font-mono-retro"
               />
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function RegisterPage() {
               Password (min 6 characters)
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#1C1917]">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] z-10">
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -121,7 +121,7 @@ export default function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="retro-input pl-10 text-sm font-mono-retro"
+                className="retro-input retro-input-icon text-sm font-mono-retro"
               />
             </div>
           </div>

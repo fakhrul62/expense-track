@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, DollarSign, Tag, FileText } from "lucide-react";
+import { X, Calendar, DollarSign, FileText } from "lucide-react";
 
 export interface CategoryType {
   _id: string;
@@ -156,7 +156,7 @@ export default function ExpenseModal({
                 Amount (৳ / $) *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#1C1917]">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] z-10">
                   <DollarSign className="w-5 h-5" />
                 </div>
                 <input
@@ -166,7 +166,7 @@ export default function ExpenseModal({
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   required
-                  className="retro-input pl-10 text-xl font-mono-retro font-bold"
+                  className="retro-input retro-input-icon text-xl font-mono-retro font-bold"
                   autoFocus
                 />
               </div>
@@ -207,7 +207,7 @@ export default function ExpenseModal({
                 Date *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#1C1917]">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] z-10">
                   <Calendar className="w-4 h-4" />
                 </div>
                 <input
@@ -215,7 +215,7 @@ export default function ExpenseModal({
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   required
-                  className="retro-input pl-10 font-mono-retro text-sm"
+                  className="retro-input retro-input-icon font-mono-retro text-sm"
                 />
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function ExpenseModal({
                 Note (Optional)
               </label>
               <div className="relative">
-                <div className="absolute top-3 left-3 pointer-events-none text-[#1C1917]">
+                <div className="absolute top-3.5 left-3.5 pointer-events-none text-[#1C1917] z-10">
                   <FileText className="w-4 h-4" />
                 </div>
                 <input
@@ -234,7 +234,7 @@ export default function ExpenseModal({
                   placeholder="e.g. Morning commute, Lunch combo..."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="retro-input pl-10 text-sm"
+                  className="retro-input retro-input-icon text-sm"
                 />
               </div>
             </div>
