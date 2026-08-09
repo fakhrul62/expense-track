@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { Lock, Mail, ArrowRight } from "lucide-react";
+import { Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -31,7 +31,6 @@ export default function LoginPage() {
       } else {
         setError("Failed to log in");
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -74,6 +73,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={loading}
                 className="retro-input retro-input-icon text-sm font-mono-retro"
               />
             </div>
@@ -94,6 +94,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading}
                 className="retro-input retro-input-icon text-sm font-mono-retro"
               />
             </div>
@@ -105,8 +106,17 @@ export default function LoginPage() {
             disabled={loading}
             className="retro-btn w-full font-mono-retro text-sm gap-2 mt-2"
           >
-            {loading ? "AUTHENTICATING..." : "LOG IN"}
-            <ArrowRight className="w-4 h-4" />
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>AUTHENTICATING...</span>
+              </>
+            ) : (
+              <>
+                <span>LOG IN</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </form>
 

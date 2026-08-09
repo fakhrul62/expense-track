@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { LogOut, Settings, Plus } from "lucide-react";
+import { LogOut, Settings, Plus, Loader2 } from "lucide-react";
 
 interface NavbarProps {
   onOpenAddExpense?: () => void;
@@ -11,8 +11,14 @@ interface NavbarProps {
 
 export default function Navbar({ onOpenAddExpense }: NavbarProps) {
   const { user, logout } = useAuth();
+  const [loggingOut, setLoggingOut] = useState(false);
 
   if (!user) return null;
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await logout();
+  };
 
   return (
     <header className="sticky top-0 z-30 bg-[#FBF7EE] border-b-2 border-[#1C1917]">
@@ -32,7 +38,7 @@ export default function Navbar({ onOpenAddExpense }: NavbarProps) {
               className="retro-btn bg-[#EA580C] text-white px-3 py-1.5 text-xs font-mono-retro font-bold rounded-none flex items-center gap-1 min-h-[38px] md:min-h-[44px]"
               aria-label="Add Expense"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 stroke-[3]" />
               <span className="hidden sm:inline">ADD</span>
             </button>
           )}
@@ -46,12 +52,17 @@ export default function Navbar({ onOpenAddExpense }: NavbarProps) {
           </Link>
 
           <button
-            onClick={logout}
+            onClick={handleLogout}
+            disabled={loggingOut}
             className="retro-btn-danger px-2.5 py-1.5 text-xs font-mono-retro rounded-none min-h-[38px] min-w-[38px] md:min-h-[44px] md:min-w-[44px] flex items-center justify-center"
             title="Logout"
             aria-label="Logout"
           >
-            <LogOut className="w-4 h-4" />
+            {loggingOut ? (
+              <Loader2 className="w-4 h-4 animate-spin text-[#991B1B]" />
+            ) : (
+              <LogOut className="w-4 h-4" />
+            )}
           </button>
         </div>
       </div>

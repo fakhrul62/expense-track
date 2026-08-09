@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import PageLoader from "@/components/PageLoader";
 
 export interface UserType {
   id: string;
@@ -13,6 +14,8 @@ export interface UserType {
 interface AuthContextType {
   user: UserType | null;
   loading: boolean;
+  globalLoadingState: string | null;
+  setGlobalLoadingState: (state: string | null) => void;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -26,6 +29,7 @@ const PUBLIC_PATHS = ["/login", "/register"];
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [globalLoadingState, setGlobalLoadingState] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -58,44 +62,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (user && isPublicPath) {
         router.push("/");
       }
+      setGlobalLoadingState(null);
     }
   }, [user, loading, pathname, router]);
 
   const login = async (email: string, password: string) => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    setGlobalLoadingState("AUTHENTICATING...");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to log in");
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to log in");
+      }
+
+      setUser(data.user);
+      setGlobalLoadingState("REDIRECTING...");
+      router.push("/");
+    } catch (err) {
+      setGlobalLoadingState(null);
+      throw err;
     }
-
-    setUser(data.user);
-    router.push("/");
   };
 
   const register = async (name: string, email: string, password: string) => {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
+    setGlobalLoadingState("CREATING ACCOUNT...");
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to register");
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to register");
+      }
+
+      setUser(data.user);
+      setGlobalLoadingState("REDIRECTING...");
+      router.push("/");
+    } catch (err) {
+      setGlobalLoadingState(null);
+      throw err;
     }
-
-    setUser(data.user);
-    router.push("/");
   };
 
   const logout = async () => {
+    setGlobalLoadingState("LOGGING OUT...");
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } finally {
@@ -109,12 +129,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         loading,
+        globalLoadingState,
+        setGlobalLoadingState,
         login,
         register,
         logout,
         refreshUser: fetchUser,
       }}
     >
+      <PageLoader
+        isGlobalLoading={!!globalLoadingState}
+        loadingText={globalLoadingState || "LOADING..."}
+      />
       {children}
     </AuthContext.Provider>
   );

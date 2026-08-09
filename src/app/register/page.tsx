@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { User as UserIcon, Mail, Lock, ArrowRight } from "lucide-react";
+import { User as UserIcon, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -37,7 +37,6 @@ export default function RegisterPage() {
       } else {
         setError("Failed to register account");
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -80,6 +79,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                disabled={loading}
                 className="retro-input retro-input-icon text-sm font-mono-retro"
               />
             </div>
@@ -100,6 +100,7 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={loading}
                 className="retro-input retro-input-icon text-sm font-mono-retro"
               />
             </div>
@@ -121,6 +122,7 @@ export default function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
+                disabled={loading}
                 className="retro-input retro-input-icon text-sm font-mono-retro"
               />
             </div>
@@ -132,8 +134,17 @@ export default function RegisterPage() {
             disabled={loading}
             className="retro-btn w-full font-mono-retro text-sm gap-2 mt-2"
           >
-            {loading ? "CREATING ACCOUNT..." : "REGISTER NOW"}
-            <ArrowRight className="w-4 h-4" />
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>CREATING ACCOUNT...</span>
+              </>
+            ) : (
+              <>
+                <span>REGISTER NOW</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </form>
 
