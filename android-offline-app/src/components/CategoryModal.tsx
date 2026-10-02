@@ -1,0 +1,185 @@
+"use client";
+
+import { addCategory } from "@/lib/local-store";
+import { useModal } from "@/lib/use-modal";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Tag } from "lucide-react";
+
+interface CategoryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+const PRESET_EMOJIS = [
+  "☕", "🛒", "⚡", "🚕", "🎬", "🍔", "🎁", "💊",
+  "🏠", "📦", "💻", "👕", "📚", "✈️", "🏋️", "🎮"
+];
+
+export default function CategoryModal(props: CategoryModalProps) {
+  return props.isOpen ? <CategoryForm {...props} /> : null;
+}
+
+function CategoryForm({
+  isOpen,
+  onClose,
+  onSuccess,
+}: CategoryModalProps) {
+  const [name, setName] = useState<string>("");
+  const [icon, setIcon] = useState<string>("🏷️");
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useModal(isOpen, onClose, loading);
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loading) return;
+    setError("");
+
+    if (!name || !name.trim()) {
+      setError("Please enter a category name");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await addCategory(name, icon);
+
+      setName("");
+      setIcon("🏷️");
+      onSuccess();
+      onClose();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
+        <motion.div
+          role="dialog" aria-modal="true" aria-label="New category"
+          initial={{ y: "100%", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "100%", opacity: 0 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="w-full max-w-md bg-[#FFFDF9] dark:bg-[#1E1E22] border-t-3 sm:border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[6px_6px_0px_0px_#1C1917] dark:shadow-[6px_6px_0px_0px_#000000] p-5 sm:p-6"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3 mb-4">
+            <h2 className="font-mono-retro font-bold text-base text-[#1C1917] dark:text-[#FBF7EE] flex items-center gap-2">
+              <span className="bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] px-2 py-0.5 border border-[#1C1917] dark:border-[#3F3F46]">
+                + NEW CATEGORY
+              </span>
+            </h2>
+            <button
+              onClick={() => !loading && onClose()}
+              aria-label="Close category"
+              disabled={loading}
+              className="w-8 h-8 flex items-center justify-center bg-[#FFFDF9] dark:bg-[#27272A] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
+            >
+              <X className="w-5 h-5 text-[#1C1917] dark:text-[#FBF7EE]" />
+            </button>
+          </div>
+
+          {error && (
+            <div className="bg-[#FEE2E2] dark:bg-[#450A0A] border-2 border-[#1C1917] dark:border-[#3F3F46] p-3 mb-4 font-mono-retro text-xs text-[#991B1B] dark:text-[#FCA5A5]">
+              ⚠️ {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Category Name */}
+            <div>
+              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] mb-1.5 uppercase">
+                Category Name *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1C1917] dark:text-[#FBF7EE] z-10">
+                  <Tag className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. Snacks, Coffee, Taxi..."
+                  maxLength={40}
+                  aria-label="Category name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="retro-input retro-input-icon text-sm font-mono-retro font-bold"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* Icon / Emoji Selection */}
+            <div>
+              <label className="block font-mono-retro text-xs font-bold text-[#1C1917] dark:text-[#FBF7EE] mb-1.5 uppercase">
+                Icon / Emoji
+              </label>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-12 h-12 flex items-center justify-center text-2xl bg-[#FEF08A] dark:bg-[#854D0E] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000]">
+                  {icon || "🏷️"}
+                </div>
+                <input
+                  type="text"
+                  placeholder="Emoji"
+                  aria-label="Category emoji"
+                  value={icon}
+                  onChange={(e) => setIcon(e.target.value)}
+                  maxLength={16}
+                  className="retro-input text-center text-xl w-24 font-mono-retro"
+                />
+              </div>
+              <div className="grid grid-cols-8 gap-1.5 p-2 border-2 border-[#1C1917] dark:border-[#3F3F46] bg-[#FBF7EE] dark:bg-[#141416]">
+                {PRESET_EMOJIS.map((eItem) => (
+                  <button
+                    key={eItem}
+                    type="button"
+                    onClick={() => setIcon(eItem)}
+                    className={`w-8 h-8 text-lg flex items-center justify-center border transition-all ${
+                      icon === eItem
+                        ? "bg-[#EA580C] dark:bg-[#F97316] border-[#1C1917] dark:border-[#3F3F46]"
+                        : "bg-[#FFFDF9] dark:bg-[#1E1E22] border-stone-300 dark:border-stone-700 hover:bg-[#FEF08A] dark:hover:bg-[#3F3F46]"
+                    }`}
+                  >
+                    {eItem}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="pt-2 flex gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={loading}
+                className="retro-btn-secondary flex-1 font-mono-retro"
+              >
+                CANCEL
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="retro-btn flex-1 font-mono-retro"
+              >
+                {loading ? "SAVING..." : "ADD CATEGORY"}
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+}

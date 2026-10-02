@@ -1,0 +1,9 @@
+﻿INSTALL: EXPTRACK-1.1.0.apk (4,189,444 bytes)
+
+Install over your existing EXPTRACK. Keep the existing app installed to preserve its expenses.
+
+Create an account or sign in while online. Tracking expenses works offline afterward. Sessions last 30 days; sign in online again when they expire.
+
+Accounts are saved in MongoDB Atlas; expenses are saved on the phone. Cloud expense backup is not enabled yet.
+
+Android 7+ and WebView/Chrome 111+ are required. An older WebView shows an update instruction after installation.

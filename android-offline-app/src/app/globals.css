@@ -1,0 +1,264 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-space-mono: "Space Mono";
+  --font-inter: "Inter";
+}
+
+html { overscroll-behavior-y: none; }
+body { min-width: 280px; }
+button, a, input, select, textarea { touch-action: manipulation; }
+button:disabled { opacity: .6; cursor: wait; }
+button:focus-visible, a:focus-visible { outline: 3px solid #EA580C; outline-offset: 3px; }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+header { padding-top: env(safe-area-inset-top, 0px); }
+[role="dialog"] { overscroll-behavior: contain; max-height: 90dvh; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); }
+.expense-row { content-visibility: auto; contain-intrinsic-size: auto 72px; }
+@media (max-width: 340px) {
+  .expense-row { flex-wrap: wrap; gap: 8px; }
+  .expense-row > div:last-child { margin-left: auto; }
+  main > div.flex.items-center.justify-between { flex-wrap: wrap; gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+@layer base {
+  body {
+    background-color: #FBF7EE;
+    color: #1C1917;
+    font-family: var(--font-inter), system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-mono-retro {
+    font-family: var(--font-space-mono), monospace;
+  }
+}
+
+/* ==========================================================================
+   LIGHT MODE DEFAULTS (When html does NOT have .dark class)
+   ========================================================================== */
+
+/* Main Container / Page Background */
+html:not(.dark) body,
+html:not(.dark) main {
+  background-color: #FBF7EE !important;
+  color: #1C1917 !important;
+}
+
+/* Header & Navbar */
+html:not(.dark) header {
+  background-color: #FBF7EE !important;
+  border-color: #1C1917 !important;
+}
+
+/* Bottom Navigation */
+html:not(.dark) .bottom-nav-bg {
+  background-color: #FBF7EE !important;
+  border-color: #1C1917 !important;
+}
+
+/* Retro Box / Cards */
+.retro-box {
+  background-color: #FFFDF9;
+  border: 2px solid #1C1917;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+  color: #1C1917;
+  transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease, color 250ms ease;
+}
+
+.retro-box-lg {
+  background-color: #FFFDF9;
+  border: 3px solid #1C1917;
+  box-shadow: 5px 5px 0px 0px #1C1917;
+  color: #1C1917;
+  transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease, color 250ms ease;
+}
+
+/* Retro Buttons */
+.retro-btn {
+  background-color: #EA580C;
+  color: #FFFFFF;
+  font-weight: 700;
+  border: 2px solid #1C1917;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.retro-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px 0px #1C1917;
+}
+
+.retro-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #1C1917;
+}
+
+.retro-btn-secondary {
+  background-color: #FFFDF9;
+  color: #1C1917;
+  font-weight: 700;
+  border: 2px solid #1C1917;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.retro-btn-secondary:hover {
+  background-color: #FEF08A;
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px 0px #1C1917;
+}
+
+.retro-btn-secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #1C1917;
+}
+
+.retro-btn-danger {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  font-weight: 700;
+  border: 2px solid #1C1917;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.retro-btn-danger:hover {
+  background-color: #EF4444;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px 0px #1C1917;
+}
+
+.retro-btn-danger:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #1C1917;
+}
+
+/* Retro Inputs */
+.retro-input {
+  background-color: #FFFDF9;
+  border: 2px solid #1C1917;
+  color: #1C1917;
+  min-height: 44px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 14px;
+  padding-right: 14px;
+  width: 100%;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 250ms ease, color 250ms ease;
+}
+
+.retro-input.pl-10,
+.retro-input.pl-11,
+.retro-input.pl-12,
+.retro-input-icon {
+  padding-left: 44px !important;
+}
+
+.retro-input:focus {
+  box-shadow: 3px 3px 0px 0px #EA580C;
+  border-color: #1C1917;
+}
+
+/* Custom subtle grain overlay */
+.retro-grain {
+  background-image: radial-gradient(#1c1917 0.75px, transparent 0.75px);
+  background-size: 12px 12px;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   DARK MODE OVERRIDES (Strictly scoped under html.dark)
+   ========================================================================== */
+
+html.dark body,
+html.dark main {
+  background-color: #141416 !important;
+  color: #FBF7EE !important;
+}
+
+html.dark header {
+  background-color: #141416 !important;
+  border-color: #3F3F46 !important;
+}
+
+html.dark .bottom-nav-bg {
+  background-color: #141416 !important;
+  border-color: #3F3F46 !important;
+}
+
+html.dark .retro-box {
+  background-color: #1E1E22 !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+  color: #FBF7EE !important;
+}
+
+html.dark .retro-box-lg {
+  background-color: #1E1E22 !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 5px 5px 0px 0px #000000 !important;
+  color: #FBF7EE !important;
+}
+
+html.dark .retro-btn {
+  background-color: #F97316 !important;
+  color: #FFFFFF !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+html.dark .retro-btn:hover {
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+}
+
+html.dark .retro-btn-secondary {
+  background-color: #27272A !important;
+  color: #FBF7EE !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+html.dark .retro-btn-secondary:hover {
+  background-color: #3F3F46 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+}
+
+html.dark .retro-btn-danger {
+  background-color: #450A0A !important;
+  color: #FCA5A5 !important;
+  border-color: #3F3F46 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+html.dark .retro-input {
+  background-color: #1E1E22 !important;
+  border-color: #3F3F46 !important;
+  color: #FBF7EE !important;
+}
+
+html.dark .retro-input:focus {
+  box-shadow: 3px 3px 0px 0px #F97316 !important;
+  border-color: #FBF7EE !important;
+}
