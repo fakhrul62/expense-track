@@ -5,6 +5,9 @@ const config: CapacitorConfig = {
   webDir: "out",
   server: { errorPath: "unsupported.html" },
   android: { backgroundColor: "#FBF7EE", allowMixedContent: false, minWebViewVersion: 111 },
-  plugins: { SystemBars: { insetsHandling: "native" } },
+  plugins: {
+    SystemBars: { insetsHandling: "native" },
+    LocalNotifications: { smallIcon: "ic_stat_spending", iconColor: "#EA580C" },
+  },
 };
 export default config;

@@ -11,6 +11,8 @@ import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import ExpenseModal, { CategoryType } from "@/components/ExpenseModal";
 import { Plus, Trash2, ShieldCheck, ArrowLeft, Sun, Moon } from "lucide-react";
 import Link from "next/link";
+import DailyReminder from "@/components/DailyReminder";
+import SyncStatus from "@/components/SyncStatus";
 
 export default function SettingsPage() {
   const { user, logout, loading: authLoading } = useAuth();
@@ -34,6 +36,12 @@ export default function SettingsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const refresh = () => { void getCategories().then(setCategories).catch(err => setError(errorMessage(err))); };
+    window.addEventListener("exptrack:cloud-change", refresh);
+    return () => window.removeEventListener("exptrack:cloud-change", refresh);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -148,9 +156,13 @@ export default function SettingsPage() {
           <p className="text-sm break-all">{user?.name}<br />{user?.email}</p>
           <button className="retro-btn-secondary px-4 text-sm" onClick={() => void logout().catch(e => setError(errorMessage(e)))}>SIGN OUT</button>
           <h2 className="font-mono-retro font-bold text-sm">ON THIS DEVICE</h2>
-          <p className="text-sm">Your expenses are saved on this device for your account. Tracking works offline after sign-in. Sign-in and registration need internet.</p>
-          <p className="text-xs opacity-75">Cloud backup is not enabled yet. Uninstalling the app or clearing its data removes your expenses.</p>
+          <p className="text-sm">Tracking works offline after sign-in. Sign-in and registration need internet. Keep pending changes on this device until they sync.</p>
+          <p className="text-xs opacity-75">Uninstalling the app or clearing its data removes entries that have not synced yet. Synced entries return when you sign in with the same account.</p>
         </section>
+
+        <section className="retro-box-lg p-5 space-y-3"><h2 className="font-mono-retro font-bold text-sm">CLOUD SYNC</h2><SyncStatus detailed /></section>
+
+        <DailyReminder />
 
         {/* Category Management */}
         <section className="retro-box-lg p-5 space-y-4">

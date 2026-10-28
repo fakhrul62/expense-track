@@ -6,6 +6,7 @@ import NativeLifecycle from "@/components/NativeLifecycle";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { SyncProvider } from "@/context/SyncContext";
 
 export const metadata: Metadata = {
   title: "EXPTRACK | Daily Expense Tracker",
@@ -30,7 +31,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans selection:bg-[#EA580C] selection:text-white transition-colors duration-250">
         <ThemeProvider>
-          <AuthProvider><NativeLifecycle />{children}</AuthProvider>
+          <AuthProvider><SyncProvider><NativeLifecycle />{children}</SyncProvider></AuthProvider>
         </ThemeProvider>
       </body>
     </html>

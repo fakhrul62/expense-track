@@ -175,6 +175,10 @@ html:not(.dark) .bottom-nav-bg {
   padding-left: 44px !important;
 }
 
+.retro-input.pr-12 {
+  padding-right: 48px;
+}
+
 .retro-input:focus {
   box-shadow: 3px 3px 0px 0px #EA580C;
   border-color: #1C1917;

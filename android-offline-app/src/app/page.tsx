@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import ExpenseModal, { CategoryType, ExpenseItem } from "@/components/ExpenseModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import SyncStatus from "@/components/SyncStatus";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -15,6 +16,8 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  List,
+  LayoutGrid,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -28,6 +31,11 @@ export default function DashboardPage() {
   const [dailyTotal, setDailyTotal] = useState(0);
   const [visibleCount, setVisibleCount] = useState(60);
   const requestVersion = useRef(0);
+  const [entryView, setEntryView] = useState<"list" | "grid">(() => typeof window !== "undefined" && localStorage.getItem("exptrack-entry-view") === "grid" ? "grid" : "list");
+  const changeEntryView = (view: "list" | "grid") => {
+    setEntryView(view);
+    localStorage.setItem("exptrack-entry-view", view);
+  };
 
   // Month navigation: format "YYYY-MM"
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
@@ -74,6 +82,12 @@ export default function DashboardPage() {
       void initializeStore().then(() => { void fetchCategories(); void fetchExpenses(); }).catch(err => setError(errorMessage(err)));
     }
   }, [user, fetchExpenses]);
+
+  useEffect(() => {
+    const refresh = () => { void getCategories().then(setCategories).catch(err => setError(errorMessage(err))); void fetchExpenses(); };
+    window.addEventListener("exptrack:cloud-change", refresh);
+    return () => window.removeEventListener("exptrack:cloud-change", refresh);
+  }, [fetchExpenses]);
 
   useEffect(() => {
     const refresh = () => { if (document.visibilityState === "visible") void fetchExpenses(); };
@@ -182,6 +196,7 @@ export default function DashboardPage() {
       <Navbar onOpenAddExpense={handleOpenAddExpense} />
 
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 pb-12 space-y-5">
+        <SyncStatus />
         {error && <div role="alert" className="retro-box p-3 text-sm text-red-700">{error}<button className="retro-btn-secondary ml-2 px-3" onClick={fetchExpenses}>Retry</button></div>}
         {/* Month Selector Bar */}
         <section className="retro-box p-3 flex items-center justify-between">
@@ -247,6 +262,11 @@ export default function DashboardPage() {
             </span>
           </h2>
 
+          <div className="flex items-center gap-2">
+            <div role="group" aria-label="Daily entry view" className="flex">
+              <button aria-label="List view" aria-pressed={entryView === "list"} onClick={() => changeEntryView("list")} className={`retro-btn-secondary p-2 ${entryView === "list" ? "bg-[#FEF08A] dark:bg-[#854D0E]" : ""}`}><List className="w-4 h-4" /></button>
+              <button aria-label="Grid view" aria-pressed={entryView === "grid"} onClick={() => changeEntryView("grid")} className={`retro-btn-secondary p-2 ${entryView === "grid" ? "bg-[#FEF08A] dark:bg-[#854D0E]" : ""}`}><LayoutGrid className="w-4 h-4" /></button>
+            </div>
           <button
             onClick={handleOpenAddExpense}
             className="retro-btn text-xs px-3 py-1.5 font-mono-retro rounded-none flex items-center gap-1 min-h-[36px]"
@@ -254,6 +274,7 @@ export default function DashboardPage() {
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>EXPENSE</span>
           </button>
+          </div>
         </div>
 
         {/* Expense List Grouped by Date */}
@@ -300,7 +321,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Items in this date group */}
-                <div className="space-y-2.5">
+                <div data-entry-view={entryView} className={entryView === "grid" ? "grid grid-cols-2 gap-2.5" : "space-y-2.5"}>
                   <AnimatePresence>
                     {group.items.map((item) => {
                       const categoryObj =
@@ -316,7 +337,7 @@ export default function DashboardPage() {
                           initial={false}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, x: -20 }}
-                          className="expense-row retro-box p-3 flex items-center justify-between gap-3 hover:bg-[#FEF08A]/30 dark:hover:bg-[#3F3F46]/40 transition-colors"
+                          className={`expense-row retro-box p-3 flex gap-3 hover:bg-[#FEF08A]/30 dark:hover:bg-[#3F3F46]/40 transition-colors ${entryView === "grid" ? "flex-col min-w-0" : "items-center justify-between"}`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             {/* Icon badge */}
@@ -338,7 +359,7 @@ export default function DashboardPage() {
                           </div>
 
                           {/* Right: Amount & Actions */}
-                          <div className="flex items-center gap-3 flex-shrink-0">
+                          <div className={`flex gap-2 ${entryView === "grid" ? "flex-wrap items-center justify-between" : "items-center flex-shrink-0"}`}>
                             <div className="font-mono-retro font-bold text-sm text-right">
                               -৳{item.amount.toFixed(2)}
                             </div>

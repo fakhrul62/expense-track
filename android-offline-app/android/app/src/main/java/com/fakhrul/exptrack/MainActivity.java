@@ -11,13 +11,14 @@ import java.io.InputStream;
 public class MainActivity extends BridgeActivity {
     @Override public void onCreate(Bundle savedInstanceState) {
         registerPlugin(ExpenseStorePlugin.class);
+        registerPlugin(GoogleAuthPlugin.class);
         super.onCreate(savedInstanceState);
         bridge.setWebViewClient(new BridgeWebViewClient(bridge) {
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String path = request.getUrl().getPath();
                 if ("localhost".equals(request.getUrl().getHost()) && path != null) {
                     String asset = null;
-                    boolean html = path.matches("/(settings|login|register)/?");
+                    boolean html = path.matches("/(settings|login|register|privacy)/?");
                     if (html) asset = "public/" + path.replaceAll("^/|/$", "") + "/index.html";
                     else if (path.endsWith(".__PAGE__.txt")) asset = "public" + path.replace(".__PAGE__.txt", "/__PAGE__.txt");
                     if (asset != null) {

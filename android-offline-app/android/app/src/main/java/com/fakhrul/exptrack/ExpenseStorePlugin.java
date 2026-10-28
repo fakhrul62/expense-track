@@ -20,21 +20,24 @@ import java.util.concurrent.Executors;
 public class ExpenseStorePlugin extends Plugin {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private Database helper;
+    private String accountId;
     @Override public void load() { helper = new Database(getContext()); }
 
     private static class Database extends SQLiteOpenHelper {
         Database(Context context) { this(context, "exptrack.db"); }
-        Database(Context context, String filename) { super(context, filename, null, 1); setWriteAheadLoggingEnabled(true); }
+        Database(Context context, String filename) { super(context, filename, null, 2); setWriteAheadLoggingEnabled(true); }
         @Override public void onConfigure(SQLiteDatabase db) { db.setForeignKeyConstraintsEnabled(true); }
         @Override public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE categories (id TEXT PRIMARY KEY, name TEXT NOT NULL COLLATE NOCASE UNIQUE, icon TEXT NOT NULL, is_default INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)");
             db.execSQL("CREATE TABLE expenses (id TEXT PRIMARY KEY, amount_cents INTEGER NOT NULL CHECK(amount_cents > 0), category_id TEXT NOT NULL REFERENCES categories(id) ON DELETE RESTRICT, note TEXT NOT NULL DEFAULT '', date TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)");
             db.execSQL("CREATE INDEX expenses_date ON expenses(date DESC, created_at DESC)");
             db.execSQL("CREATE INDEX expenses_category ON expenses(category_id)");
+            CloudSyncStorage.create(db);
         }
         @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            // Add explicit, non-destructive migrations when the schema changes.
-            throw new IllegalStateException("Unsupported database migration");
+            if (oldVersion == 1 && newVersion == 2) {
+                try { CloudSyncStorage.migrate(db); } catch (Exception error) { throw new IllegalStateException("Could not migrate sync storage", error); }
+            } else throw new IllegalStateException("Unsupported database migration");
         }
     }
 
@@ -52,6 +55,7 @@ public class ExpenseStorePlugin extends Plugin {
                 helper.close();
                 helper = new Database(getContext(), id.equals(owner) ? "exptrack.db" : "exptrack_" + id + ".db");
                 helper.getWritableDatabase();
+                accountId = id;
                 call.resolve();
             } catch (Exception error) { call.reject("Could not open account storage", error); }
         });
@@ -123,21 +127,7 @@ public class ExpenseStorePlugin extends Plugin {
                         filtered ? new String[]{month + "-01", month + "-31"} : null,
                         null, null, null)) {
                     while (cursor.moveToNext()) {
-                        JSObject record = new JSObject();
-                        record.put("_id", string(cursor, "id"));
-                        record.put("createdAt", string(cursor, "created_at"));
-                        record.put("updatedAt", string(cursor, "updated_at"));
-                        if ("categories".equals(table)) {
-                            record.put("name", string(cursor, "name"));
-                            record.put("icon", string(cursor, "icon"));
-                            record.put("isDefault", cursor.getInt(cursor.getColumnIndexOrThrow("is_default")) == 1);
-                        } else {
-                            record.put("amount", cursor.getLong(cursor.getColumnIndexOrThrow("amount_cents")) / 100.0);
-                            record.put("categoryId", string(cursor, "category_id"));
-                            record.put("note", string(cursor, "note"));
-                            record.put("date", string(cursor, "date"));
-                        }
-                        records.put(record);
+                        records.put(CloudSyncStorage.record(cursor, table));
                     }
                 }
                 JSObject result = new JSObject(); result.put("records", records); call.resolve(result);
@@ -153,26 +143,11 @@ public class ExpenseStorePlugin extends Plugin {
                 JSONObject record = call.getObject("record");
                 if (record == null) throw new IllegalArgumentException("Missing record");
                 String id = record.getString("_id");
-                ContentValues values = new ContentValues();
-                values.put("id", id);
-                values.put("updated_at", record.getString("updatedAt"));
-                if ("categories".equals(table)) {
-                    values.put("name", record.getString("name"));
-                    values.put("icon", record.getString("icon"));
-                    values.put("is_default", record.getBoolean("isDefault") ? 1 : 0);
-                } else {
-                    values.put("amount_cents", Math.round(record.getDouble("amount") * 100));
-                    values.put("category_id", record.getString("categoryId"));
-                    values.put("note", record.optString("note", ""));
-                    values.put("date", record.getString("date"));
-                }
                 SQLiteDatabase db = helper.getWritableDatabase();
                 db.beginTransaction();
                 try {
-                    if (db.update(table, values, "id = ?", new String[]{id}) == 0) {
-                        values.put("created_at", record.getString("createdAt"));
-                        db.insertOrThrow(table, null, values);
-                    }
+                    CloudSyncStorage.write(db, table, record);
+                    CloudSyncStorage.enqueue(db, table, id, record);
                     db.setTransactionSuccessful();
                 } finally { db.endTransaction(); }
                 call.resolve();
@@ -198,11 +173,28 @@ public class ExpenseStorePlugin extends Plugin {
                         }
                     }
                     db.delete(table, "id = ?", new String[]{id});
+                    CloudSyncStorage.enqueue(db, table, id, null);
                     db.setTransactionSuccessful();
                 } finally { db.endTransaction(); }
                 call.resolve();
             } catch (IllegalArgumentException error) { call.reject(error.getMessage(), error); }
               catch (Exception error) { call.reject("Could not delete. Your expenses have not been changed.", error); }
+        });
+    }
+    @PluginMethod public void syncPending(PluginCall call) {
+        worker.execute(() -> {
+            try {
+                if (accountId == null || !accountId.equals(call.getString("accountId"))) throw new IllegalArgumentException("Account changed");
+                JSObject result = new JSObject(); result.put("mutations", CloudSyncStorage.pending(helper.getReadableDatabase())); call.resolve(result);
+            } catch (Exception error) { call.reject("Could not read pending sync changes", error); }
+        });
+    }
+    @PluginMethod public void syncApply(PluginCall call) {
+        worker.execute(() -> {
+            try {
+                if (accountId == null || !accountId.equals(call.getString("accountId"))) throw new IllegalArgumentException("Account changed");
+                CloudSyncStorage.apply(helper.getWritableDatabase(), call.getObject("response")); call.resolve();
+            } catch (Exception error) { call.reject("Could not apply cloud changes. Your local records are preserved.", error); }
         });
     }
     @Override protected void handleOnDestroy() { worker.execute(() -> helper.close()); worker.shutdown(); }

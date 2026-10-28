@@ -10,7 +10,7 @@ if (!$env:ANDROID_HOME) { throw 'Set ANDROID_HOME to an Android SDK with platfor
 $sdkPath = $env:ANDROID_HOME.Replace('\', '/')
 [IO.File]::WriteAllText("$PWD\android\local.properties", "sdk.dir=$sdkPath`n")
 New-Item -ItemType Directory -Force .keys,dist,build/apk | Out-Null
-$apkName = 'EXPTRACK-1.1.0.apk'
+$apkName = 'EXPTRACK-1.3.1.apk'
 $stagedApk = "build/apk/$apkName"
 $finalApk = "dist/$apkName"
 if (!(Test-Path .keys/release.json)) {

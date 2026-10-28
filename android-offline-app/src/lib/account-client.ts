@@ -19,11 +19,11 @@ export async function writeSession(session: AccountSession | null) {
   else if (session) localStorage.setItem("exptrack-account", JSON.stringify(session));
   else localStorage.removeItem("exptrack-account");
 }
-export async function accountRequest(action: string, input?: Record<string, string>, session?: AccountSession | null): Promise<AccountSession> {
+export async function accountServiceRequest<T>(action: string, input?: Record<string, string>, session?: AccountSession | null): Promise<T> {
   const base = native() ? "https://expense-track-lovat.vercel.app" : "";
   try {
     const response = await fetch(`${base}/api/auth/${action}/`, {
-      method: action === "me" ? "GET" : "POST",
+      method: ["me", "google-config"].includes(action) ? "GET" : "POST",
       credentials: native() ? "omit" : "include",
       headers: { "Content-Type": "application/json", ...(native() ? { "X-EXPTRACK-Client": "android" } : {}), ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {}) },
       ...(input ? { body: JSON.stringify(input) } : {}),
@@ -37,3 +37,4 @@ export async function accountRequest(action: string, input?: Record<string, stri
     throw error;
   }
 }
+export const accountRequest = (action: string, input?: Record<string, string>, session?: AccountSession | null) => accountServiceRequest<AccountSession>(action, input, session);

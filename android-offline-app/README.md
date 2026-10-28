@@ -1,18 +1,23 @@
 ﻿# EXPTRACK for Android
 
-Offline expense tracker packaged with Capacitor. The Android app stores expenses and categories in a private SQLite database. All screens, scripts, icons, and fonts are bundled in the APK. Email registration and login use the HTTPS backend at https://expense-track-lovat.vercel.app and MongoDB Atlas. Expense tracking stays local and works offline after login.
+Expense tracker packaged with Capacitor. Android saves expenses and categories in private SQLite storage and syncs them with https://expense-track-lovat.vercel.app through MongoDB Atlas. Screens, scripts, icons, and fonts are bundled in the APK. Expense tracking works offline after login; queued changes upload when the app reconnects or reopens online.
 
 ## Install
 
-Copy `dist/EXPTRACK-1.1.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it.
+Copy `dist/EXPTRACK-1.3.1.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
 
 Requires Android 7.0 (API 24) or newer and Android System WebView/Chrome 111 or newer. An outdated WebView shows an update instruction screen. Broad compatibility is targeted; performance on every Android device has not been verified.
 
-Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.users. Opaque server sessions are hashed in auth_sessions. Expense data stays on the device; cloud expense backup and synchronization are not implemented. Uninstalling or clearing app data removes the local records. Installing a newer APK signed with the same key preserves them.
+Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.users. Opaque server sessions are hashed in auth_sessions. Synced expenses and categories restore after signing into the same account. Uninstalling or clearing app data loses changes that have not synced. Installing a newer APK signed with the same key preserves local records.
 
 ## Features
 
 - Create, edit, delete, and browse expenses by month.
+- Sign in or sign up with Google, or use email and password. Native Google sign-in requires Google Play services.
+- Automatic account-specific app/site sync, including edits and deletions. Offline changes persist across restarts. Sync runs while the app is open, on reconnect/resume, and every 30 seconds while visible; Settings also provides Sync now. Closed-app background uploads are not scheduled. For simultaneous edits, the last change received by the server wins.
+- Show/hide the password on sign-in and registration.
+- Switch daily entries between list and grid; the selected view stays saved on this device.
+- Android daily spending notification around 8:30 PM local time, scheduled offline. Allow notifications after signing in; turn the reminder off/on in Settings. Signing out cancels it. Android battery restrictions can delay delivery. Background reminders are not available in the browser preview.
 - Today's total follows the device's local date, independent of the selected month.
 - Amounts are stored as integer cents in SQLite.
 - Default and custom categories, with protection against deleting categories in use.
@@ -46,4 +51,6 @@ The browser preview uses IndexedDB; Android uses SQLite through `ExpenseStorePlu
 
 `scripts/check-offline.mjs --native` runs the same workflows through an Android debug WebView forwarded to port 9222. Set `ANDROID_HOME` for back-button checks. Run it only on a fresh test installation. Results and screenshots go to `test-results/`.
 
-The new account API is in src/app/api/auth/[action]/route.ts. Configure MONGODB_URI only in server environment variables. Android credentials use Keystore-backed AES-GCM storage; browser authentication uses an HTTP-only cookie. Sessions last 30 days. The first signed-in account keeps the pre-login local expenses; other accounts receive separate local databases. Sign-out preserves records for returning accounts. The web and mobile builds are separate: mobile export stages source without server routes. Original server routes and login screens are preserved in `archive/` for reference. They are excluded from the Android export. No remote synchronization has been added.
+The account API is in src/app/api/auth/[action]/route.ts; cloud sync is in src/app/api/sync/route.ts. Configure MONGODB_URI and GOOGLE_CLIENT_ID on the server. Android credentials use Keystore-backed AES-GCM storage; browser authentication uses an HTTP-only cookie. Sessions last 30 days. The first signed-in account keeps the pre-login local expenses; other accounts receive separate local databases. Sign-out preserves records for returning accounts. Existing SQLite and IndexedDB databases migrate their records into the durable sync queue. The web and mobile builds are separate: mobile export stages source without server routes. Original server routes and login screens are preserved in `archive/` for reference and excluded from the Android export.
+
+Google configuration is documented in GOOGLE-SETUP.md. Current release evidence is in VALIDATION-1.3.1.md; Google sign-in limitations are documented in VALIDATION-1.3.0.md.

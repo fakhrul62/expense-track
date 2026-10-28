@@ -1,9 +1,9 @@
-﻿INSTALL: EXPTRACK-1.1.0.apk (4,189,444 bytes)
+EXPTRACK 1.3.1 for Android
 
-Install over your existing EXPTRACK. Keep the existing app installed to preserve its expenses.
+Install EXPTRACK-1.3.1.apk over your existing EXPTRACK to preserve local expenses. Keep the current app installed; do not uninstall first.
 
-Create an account or sign in while online. Tracking expenses works offline afterward. Sessions last 30 days; sign in online again when they expire.
+Android 7.0+ and Android System WebView/Chrome 111+ are required. Google sign-in needs Google Play services. Sign into the same account on the app and site to sync expenses and categories. Offline changes upload when the app reconnects or reopens online.
 
-Accounts are saved in MongoDB Atlas; expenses are saved on the phone. Cloud expense backup is not enabled yet.
+Allow notifications to receive the daily reminder around 8:30 PM local time. This update includes a white status icon and the EXPTRACK logo in the notification card. Android battery settings can delay delivery.
 
-Android 7+ and WebView/Chrome 111+ are required. An older WebView shows an update instruction after installation.
+Source and validation: https://github.com/fakhrul62/expense-track/tree/main/android-offline-app
