@@ -285,3 +285,19 @@ html.dark .bottom-nav-bg .bottom-nav-add { background: #FF9A57; color: #24170E; 
   box-shadow: 2px 2px 0 #1C1917;
 }
 .month-selector .retro-btn-secondary svg { width: 18px; height: 18px; }
+
+[role="dialog"].expense-dialog { max-height: 90dvh; padding-bottom: 0; }
+.expense-form-footer { padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); }
+.expense-dialog input[type="date"] { min-height: 52px; }
+.expense-category[aria-pressed="true"] { background: #EA580C; color: white; }
+.batch-expense-row { min-height: 44px; }
+@media (max-width: 639px) {
+  [role="dialog"].expense-dialog {
+    height: 100%;
+    max-height: none;
+    max-width: none;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}

@@ -155,6 +155,28 @@ public class ExpenseStorePlugin extends Plugin {
         });
     }
 
+    @PluginMethod public void putBatch(PluginCall call) {
+        worker.execute(() -> {
+            try {
+                if (accountId == null || !accountId.equals(call.getString("accountId"))) throw new IllegalArgumentException("Account changed. Reopen the form and try again.");
+                JSArray records = call.getArray("records");
+                if (records == null || records.length() < 1 || records.length() > 20) throw new IllegalArgumentException("Add between 1 and 20 expenses.");
+                SQLiteDatabase db = helper.getWritableDatabase();
+                db.beginTransaction();
+                try {
+                    for (int index = 0; index < records.length(); index++) {
+                        JSONObject record = records.getJSONObject(index);
+                        CloudSyncStorage.write(db, "expenses", record);
+                        CloudSyncStorage.enqueue(db, "expenses", record.getString("_id"), record);
+                    }
+                    db.setTransactionSuccessful();
+                } finally { db.endTransaction(); }
+                call.resolve();
+            } catch (IllegalArgumentException error) { call.reject(error.getMessage(), error); }
+              catch (Exception error) { call.reject("Could not save these expenses. Nothing in this batch was saved; check the categories and device storage, then try again.", error); }
+        });
+    }
+
     @PluginMethod public void remove(PluginCall call) {
         worker.execute(() -> {
             try {

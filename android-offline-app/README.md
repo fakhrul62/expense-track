@@ -4,7 +4,7 @@ Expense tracker packaged with Capacitor. Android saves expenses and categories i
 
 ## Install
 
-Copy `dist/EXPTRACK-1.6.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
+Copy `dist/EXPTRACK-1.7.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
 
 Requires Android 7.0 (API 24) or newer and Android System WebView/Chrome 111 or newer. An outdated WebView shows an update instruction screen. Broad compatibility is targeted; performance on every Android device has not been verified.
 
@@ -19,6 +19,8 @@ Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.
 - Live interface preview: run npm run dev -- --port 3005 and open http://localhost:3005.
 
 - Create, edit, delete, and browse expenses by month.
+- Add up to 20 expenses in one popup: use + Add Another beside Close, Review expenses to edit/remove drafts, then Save all. Each entry has its own category/date/note. Count and total stay visible, with one editor at a time. The phone form fills the app screen and keeps Add Another reachable with the number pad open.
+- Batch entries and their pending sync changes are saved together in one IndexedDB/SQLite transaction. If any entry fails, the batch is rolled back and drafts stay open for correction.
 - Sign in or sign up with Google, or use email and password. Native Google sign-in requires Google Play services.
 - Automatic account-specific app/site sync, including edits and deletions. Offline changes persist across restarts. Sync runs while the app is open, on reconnect/resume, and every 30 seconds while visible; Settings also provides Sync now. Closed-app background uploads are not scheduled. For simultaneous edits, the last change received by the server wins.
 - Show/hide the password on sign-in and registration.

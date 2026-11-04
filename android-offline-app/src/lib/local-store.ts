@@ -21,6 +21,7 @@ interface NativeStore {
   setUser(options: { id: string }): Promise<void>;
   list(options: { store: Store; month?: string }): Promise<{ records: RecordType[] }>;
   put(options: { store: Store; record: RecordType }): Promise<void>;
+  putBatch(options: { accountId: string; records: Expense[] }): Promise<void>;
   remove(options: { store: Store; id: string }): Promise<void>;
   syncPending(options: { accountId: string }): Promise<{ mutations: SyncMutation[] }>;
   syncApply(options: { accountId: string; response: SyncResponse }): Promise<void>;
@@ -209,14 +210,52 @@ export async function getTransactions(month?: string, includeExistingDebt = fals
     .map(e => ({ ...e, categoryId: byId.get(e.categoryId) ?? e.categoryId }))
     .filter(e => includeExistingDebt || loanDetails(e)?.received !== false);
 }
-async function saveLedgerEntry(input: { amount: number; categoryId: string; note: string; date: string }, id?: string) {
-  await initializeStore();
+export type ExpenseInput = { amount: number; categoryId: string; note: string; date: string };
+function validateExpenseInput(input: ExpenseInput) {
   const cents = Math.round(input.amount * 100);
   if (!Number.isFinite(input.amount) || cents < 1 || cents > 99999999999 || Math.abs(input.amount * 100 - cents) > 0.0001) throw new Error("Enter an amount from 0.01 to 999,999,999.99 with at most two decimal places.");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date) || localDate(new Date(`${input.date}T12:00:00`)) !== input.date) throw new Error("Choose a valid date.");
   if (input.note.length > 500) throw new Error("Keep the note within 500 characters.");
+  return cents;
+}
+async function saveLedgerEntry(input: ExpenseInput, id?: string) {
+  await initializeStore();
+  const cents = validateExpenseInput(input);
   const now = new Date().toISOString();
   await put("expenses", { ...input, note: input.note.trim(), amount: cents / 100, _id: id ?? crypto.randomUUID(), createdAt: now, updatedAt: now });
+}
+export async function saveExpenses(inputs: ExpenseInput[], ids: string[]) {
+  const accountId = activeAccount;
+  if (!accountId) throw new Error("Sign in before saving expenses.");
+  if (!inputs.length || inputs.length > 20 || ids.length !== inputs.length || new Set(ids).size !== ids.length || ids.some(id => !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(id))) throw new Error("Add between 1 and 20 expenses.");
+  const now = new Date().toISOString();
+  const records = inputs.map((input, index) => {
+    const cents = validateExpenseInput(input);
+    if (!input.categoryId || isIncomeCategory(input.categoryId) || input.categoryId === REPAYMENT_CATEGORY || input.note.startsWith("EXTRACK-LOAN:1:")) throw new Error("Choose a spending category for every expense.");
+    return { ...input, amount: cents / 100, note: input.note.trim(), _id: ids[index], createdAt: now, updatedAt: now };
+  });
+  await initializeStore();
+  if (accountId !== activeAccount) throw new Error("Account changed. Reopen the form and try again.");
+  if (isNative()) { await native.putBatch({ accountId, records }); changed(); return; }
+  const database = await db();
+  if (accountId !== activeAccount) throw new Error("Account changed. Reopen the form and try again.");
+  const tx = database.transaction(["expenses", "categories", "outbox", "aliases"], "readwrite");
+  try {
+    for (const expense of records) {
+      for (let i = 0; i < 10; i++) {
+        const alias = await tx.objectStore("aliases").get(expense.categoryId);
+        if (!alias) break;
+        expense.categoryId = alias.canonicalId;
+      }
+      if (!await tx.objectStore("categories").get(expense.categoryId)) throw new Error("A category no longer exists. Choose another category before saving.");
+      const previous = await tx.objectStore("expenses").get(expense._id);
+      const saved = { ...expense, createdAt: previous?.createdAt ?? expense.createdAt };
+      await tx.objectStore("expenses").put(saved);
+      await tx.objectStore("outbox").put(changeRecord("expenses", saved._id, saved));
+    }
+    await tx.done;
+  } catch (error) { tx.abort(); await tx.done.catch(() => undefined); throw error; }
+  changed();
 }
 export async function saveExpense(input: { amount: number; categoryId: string; note: string; date: string }, id?: string) {
   if (id && loanDetails((await getTransactions(undefined, true)).find(e => e._id === id) ?? { _id: id, ...input })) throw new Error("Manage this entry on the Loans page.");
