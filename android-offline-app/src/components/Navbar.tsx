@@ -22,7 +22,7 @@ export default function Navbar({ onOpenAddExpense }: NavbarProps) {
       <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Text-Only Branding */}
         <Link href="/" className="group flex items-center gap-2">
-          <span className="font-mono-retro font-black text-xl tracking-tighter px-2 py-0.5 bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000] group-active:translate-x-0.5 group-active:translate-y-0.5 group-active:shadow-none transition-all duration-150">
+          <span className="brand-mark font-mono-retro font-black text-xl tracking-tighter px-2 py-0.5 bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] border-2 border-[#1C1917] dark:border-[#3F3F46] shadow-[2px_2px_0px_0px_#1C1917] dark:shadow-[2px_2px_0px_0px_#000000] group-active:translate-x-0.5 group-active:translate-y-0.5 group-active:shadow-none transition-all duration-150">
             EXPTRACK
           </span>
         </Link>

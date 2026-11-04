@@ -192,77 +192,37 @@ html:not(.dark) .bottom-nav-bg {
   pointer-events: none;
 }
 
-/* ==========================================================================
-   DARK MODE OVERRIDES (Strictly scoped under html.dark)
-   ========================================================================== */
-
-html.dark body,
-html.dark main {
-  background-color: #141416 !important;
-  color: #FBF7EE !important;
+/* Dark mode: calm surfaces and soft depth, with orange reserved for actions. */
+html.dark { color-scheme: dark; }
+html.dark body, html.dark main { background: #151719 !important; color: #ECEDEE !important; }
+html.dark header, html.dark .bottom-nav-bg { background: #191C1F !important; border-color: #353A40 !important; }
+html.dark [class*="border-"] { border-color: #353A40; }
+html.dark [class*="shadow-"] { box-shadow: none !important; }
+html.dark .retro-box, html.dark .retro-box-lg, html.dark .stat-card {
+ background: #202428 !important; color: #ECEDEE !important; border: 1px solid #383F46 !important;
+ border-radius: 10px; box-shadow: 0 2px 8px #00000020 !important;
 }
-
-html.dark header {
-  background-color: #141416 !important;
-  border-color: #3F3F46 !important;
+html.dark .retro-btn, html.dark .retro-btn-secondary, html.dark .retro-btn-danger {
+ border: 1px solid transparent !important; border-radius: 7px; box-shadow: none !important;
 }
-
-html.dark .bottom-nav-bg {
-  background-color: #141416 !important;
-  border-color: #3F3F46 !important;
+html.dark .retro-btn { background: #FF9A57 !important; color: #24170E !important; }
+html.dark .retro-btn:hover { background: #FFAE78 !important; transform: translateY(-1px); }
+html.dark .retro-btn-secondary { background: #292E33 !important; color: #ECEDEE !important; border-color: #424A52 !important; }
+html.dark .retro-btn-secondary:hover { background: #353D44 !important; transform: translateY(-1px); }
+html.dark .retro-btn-danger { background: #3B2428 !important; color: #FFB2B8 !important; border-color: #694047 !important; }
+html.dark .retro-btn-danger:hover { background: #512E34 !important; }
+html.dark .retro-btn:active, html.dark .retro-btn-secondary:active, html.dark .retro-btn-danger:active { transform: scale(.98); }
+html.dark .retro-input { background: #191D21 !important; color: #ECEDEE !important; border: 1px solid #515B65 !important; border-radius: 7px; }
+html.dark .retro-input:focus { border-color: #FF9A57 !important; box-shadow: 0 0 0 3px #FF9A5726 !important; }
+html.dark .brand-mark { background: transparent !important; color: #FFB581 !important; border-color: transparent !important; box-shadow: none !important; }
+html.dark [class*="bg-[#854D0E]"], html.dark .bottom-nav-bg [aria-current="page"] {
+ background: #3D2D22 !important; color: #FFD1AF !important; border-color: #6A4A33 !important; box-shadow: none !important;
 }
-
-html.dark .retro-box {
-  background-color: #1E1E22 !important;
-  border-color: #3F3F46 !important;
-  box-shadow: 3px 3px 0px 0px #000000 !important;
-  color: #FBF7EE !important;
-}
-
-html.dark .retro-box-lg {
-  background-color: #1E1E22 !important;
-  border-color: #3F3F46 !important;
-  box-shadow: 5px 5px 0px 0px #000000 !important;
-  color: #FBF7EE !important;
-}
-
-html.dark .retro-btn {
-  background-color: #F97316 !important;
-  color: #FFFFFF !important;
-  border-color: #3F3F46 !important;
-  box-shadow: 3px 3px 0px 0px #000000 !important;
-}
-
-html.dark .retro-btn:hover {
-  box-shadow: 4px 4px 0px 0px #000000 !important;
-}
-
-html.dark .retro-btn-secondary {
-  background-color: #27272A !important;
-  color: #FBF7EE !important;
-  border-color: #3F3F46 !important;
-  box-shadow: 3px 3px 0px 0px #000000 !important;
-}
-
-html.dark .retro-btn-secondary:hover {
-  background-color: #3F3F46 !important;
-  box-shadow: 4px 4px 0px 0px #000000 !important;
-}
-
-html.dark .retro-btn-danger {
-  background-color: #450A0A !important;
-  color: #FCA5A5 !important;
-  border-color: #3F3F46 !important;
-  box-shadow: 3px 3px 0px 0px #000000 !important;
-}
-
-html.dark .retro-input {
-  background-color: #1E1E22 !important;
-  border-color: #3F3F46 !important;
-  color: #FBF7EE !important;
-}
-
-html.dark .retro-input:focus {
-  box-shadow: 3px 3px 0px 0px #F97316 !important;
-  border-color: #FBF7EE !important;
-}
+html.dark .bottom-nav-bg a { border-radius: 7px; border-width: 1px; }
+html.dark .bottom-nav-bg button { border-radius: 12px; box-shadow: 0 3px 10px #00000030 !important; }
+html.dark [aria-pressed="true"] { background: #3D2D22 !important; color: #FFD1AF !important; border-color: #AC7146 !important; }
+html.dark .stat-card [class*="text-amber"], html.dark .stat-card [class*="text-[#FEF08A]"] { color: #ECEDEE !important; }
+html.dark .stat-card [class*="absolute"] { background: #2B333A !important; color: #C3CBD2 !important; border-color: #424A52 !important; }
+html.dark [role="dialog"] { background: #202428 !important; color: #ECEDEE; border-color: #424A52 !important; border-radius: 14px 14px 0 0; box-shadow: 0 -6px 32px #00000040 !important; }
+@media (min-width: 640px) { html.dark [role="dialog"] { border-radius: 14px; } }
+html.dark .expense-row:hover { background: #282F35 !important; }

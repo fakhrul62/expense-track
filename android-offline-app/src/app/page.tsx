@@ -1,6 +1,8 @@
 "use client";
+import { isIncomeCategory, incomeLabel } from "@/lib/income";
 
-import { initializeStore, getCategories, getExpenses, deleteExpense, localDate, errorMessage } from "@/lib/local-store";
+
+import { initializeStore, getCategories, getExpenses, getTransactions, getIncomeCategories, getBalance, deleteExpense, localDate, errorMessage } from "@/lib/local-store";
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
@@ -22,6 +24,9 @@ import {
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
+  const [incomeMode, setIncomeMode] = useState(false);
+  const [incomeCategories, setIncomeCategories] = useState<CategoryType[]>([]);
+  const [balance, setBalance] = useState({ received: 0, spent: 0, available: 0 });
   const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -65,9 +70,11 @@ export default function DashboardPage() {
     setError("");
     try {
       const today = localDate();
-      const [items, todayItems] = await Promise.all([getExpenses(selectedMonth), getExpenses(today.slice(0, 7))]);
+      const [items, todayItems, currentBalance, sources] = await Promise.all([getTransactions(selectedMonth), getExpenses(today.slice(0, 7)), getBalance(), getIncomeCategories()]);
       if (version !== requestVersion.current) return;
       setExpenses(items);
+      setBalance(currentBalance);
+      setIncomeCategories(sources);
       setTodayStr(today);
       setDailyTotal(todayItems.filter(e => e.date === today).reduce((sum, e) => sum + Math.round(e.amount * 100), 0) / 100);
     } catch (err) {
@@ -98,7 +105,7 @@ export default function DashboardPage() {
   }, [fetchExpenses, todayStr]);
 
   const monthlyTotal = useMemo(() => {
-    return expenses.reduce((sum, e) => sum + Math.round(e.amount * 100), 0) / 100;
+    return expenses.reduce((sum, e) => sum + (isIncomeCategory(e.categoryId) ? 0 : Math.round(e.amount * 100)), 0) / 100;
   }, [expenses]);
 
   // Group expenses by date (most recent first)
@@ -114,7 +121,7 @@ export default function DashboardPage() {
     const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
     const visibleIds = new Set(expenses.slice(0, visibleCount).map(item => item._id));
     return sortedDates.map((date) => {
-      const dayTotal = groups[date].reduce((sum, item) => sum + Math.round(item.amount * 100), 0) / 100;
+      const dayTotal = groups[date].reduce((sum, item) => sum + (isIncomeCategory(item.categoryId) ? -1 : 1) * Math.round(item.amount * 100), 0) / 100;
       const items = groups[date].filter(item => visibleIds.has(item._id));
       return {
         date,
@@ -158,11 +165,13 @@ export default function DashboardPage() {
   };
 
   const handleOpenAddExpense = () => {
+    setIncomeMode(false);
     setEditingExpense(null);
     setIsExpenseModalOpen(true);
   };
 
   const handleOpenEditExpense = (expense: ExpenseItem) => {
+    setIncomeMode(isIncomeCategory(expense.categoryId));
     setEditingExpense(expense);
     setIsExpenseModalOpen(true);
   };
@@ -197,6 +206,12 @@ export default function DashboardPage() {
 
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 pb-12 space-y-5">
         <SyncStatus />
+        <section className="retro-box-lg p-4 space-y-3" aria-label="Your balance">
+          <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-mono-retro">AVAILABLE BALANCE</p><p data-testid="available-balance" className="text-2xl font-bold">৳ {balance.available.toLocaleString('en-US', {minimumFractionDigits:2})}</p></div>
+          <button className="retro-btn px-3 text-xs shrink-0" onClick={() => { setIncomeMode(true); setEditingExpense(null); setIsExpenseModalOpen(true); }}>+ ADD MONEY</button></div>
+          <div className="grid grid-cols-2 gap-2 text-xs"><p>Received: ৳ {balance.received.toLocaleString('en-US',{minimumFractionDigits:2})}</p><p>Spent: ৳ {balance.spent.toLocaleString('en-US',{minimumFractionDigits:2})}</p></div>
+          <p className="text-xs opacity-70">All entries through today · carries across months</p>
+        </section>
         {error && <div role="alert" className="retro-box p-3 text-sm text-red-700">{error}<button className="retro-btn-secondary ml-2 px-3" onClick={fetchExpenses}>Retry</button></div>}
         {/* Month Selector Bar */}
         <section className="retro-box p-3 flex items-center justify-between">
@@ -225,32 +240,33 @@ export default function DashboardPage() {
         {/* Totals Section */}
         <section className="grid grid-cols-2 gap-3 sm:gap-4">
           {/* Daily Total Box */}
-          <div className="retro-box-lg p-4 flex flex-col justify-between relative overflow-hidden">
+          <div className="stat-card retro-box-lg p-4 flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 right-0 bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] border-b-2 border-l-2 border-[#1C1917] dark:border-[#3F3F46] px-2 py-0.5 font-mono-retro text-[10px] font-bold">
               TODAY
             </div>
             <span className="font-mono-retro text-xs opacity-75 font-bold uppercase tracking-wider mb-2">
               Daily Total
             </span>
-            <div className="font-mono-retro font-black text-xl sm:text-2xl truncate">
+            <div className="font-mono-retro font-black text-base sm:text-2xl break-all">
               ৳ {dailyTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </div>
           </div>
 
           {/* Monthly Total Box */}
-          <div className="bg-[#1C1917] dark:bg-[#27272A] text-white border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[4px_4px_0px_0px_#EA580C] dark:shadow-[4px_4px_0px_0px_#F97316] p-4 flex flex-col justify-between relative overflow-hidden">
+          <div className="stat-card bg-[#1C1917] dark:bg-[#27272A] text-white border-3 border-[#1C1917] dark:border-[#3F3F46] shadow-[4px_4px_0px_0px_#EA580C] dark:shadow-[4px_4px_0px_0px_#F97316] p-4 flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 right-0 bg-[#EA580C] dark:bg-[#F97316] text-white border-b-2 border-l-2 border-[#1C1917] dark:border-[#3F3F46] px-2 py-0.5 font-mono-retro text-[10px] font-bold">
               MONTH
             </div>
             <span className="font-mono-retro text-xs text-amber-200/80 font-bold uppercase tracking-wider mb-2">
               Monthly Total
             </span>
-            <div className="font-mono-retro font-black text-xl sm:text-2xl text-[#FEF08A] truncate">
+            <div className="font-mono-retro font-black text-base sm:text-2xl text-[#FEF08A] break-all">
               ৳ {monthlyTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </div>
           </div>
         </section>
 
+        <p className="text-xs font-mono-retro">Month received: ৳ {expenses.filter(e => isIncomeCategory(e.categoryId)).reduce((n,e) => n + Math.round(e.amount*100),0)/100} · Future entries are excluded from available balance.</p>
         {/* Expenses Header & Add trigger */}
         <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-2 pt-2">
           <h2 className="font-mono-retro font-bold text-sm flex items-center gap-2">
@@ -294,7 +310,7 @@ export default function DashboardPage() {
           <div className="retro-box p-8 text-center space-y-3">
             <div className="text-4xl">💸</div>
             <h3 className="font-mono-retro font-bold text-sm">
-              NO EXPENSES RECORDED YET
+              NO TRANSACTIONS RECORDED YET
             </h3>
             <p className="font-mono-retro text-xs opacity-75 max-w-xs mx-auto">
               Tap the button below or top bar to add your first expense for {formatMonthTitle(selectedMonth)}.
@@ -316,7 +332,7 @@ export default function DashboardPage() {
                     {formatDateHeader(group.date)}
                   </span>
                   <span className="opacity-80">
-                    Day Total: ৳{group.dayTotal.toFixed(2)}
+                    Net spent: ৳{group.dayTotal.toFixed(2)}
                   </span>
                 </div>
 
@@ -328,7 +344,8 @@ export default function DashboardPage() {
                         typeof item.categoryId === "object"
                           ? item.categoryId
                           : null;
-                      const catName = categoryObj?.name || "Expense";
+                      const incoming = isIncomeCategory(item.categoryId);
+                      const catName = incomeLabel(categoryObj?.name || "Expense");
                       const catIcon = categoryObj?.icon || "🏷️";
 
                       return (
@@ -348,6 +365,7 @@ export default function DashboardPage() {
                             {/* Info */}
                             <div className="min-w-0">
                               <h4 className="font-mono-retro text-xs font-bold truncate">
+                                {incoming && <span className="text-green-700 dark:text-green-300 mr-1">INCOME</span>}
                                 {catName}
                               </h4>
                               {item.note && (
@@ -361,7 +379,7 @@ export default function DashboardPage() {
                           {/* Right: Amount & Actions */}
                           <div className={`flex gap-2 ${entryView === "grid" ? "flex-wrap items-center justify-between" : "items-center flex-shrink-0"}`}>
                             <div className="font-mono-retro font-bold text-sm text-right">
-                              -৳{item.amount.toFixed(2)}
+                              {incoming ? "+" : "-"}৳{item.amount.toFixed(2)}
                             </div>
 
                             {/* Action icons */}
@@ -370,7 +388,7 @@ export default function DashboardPage() {
                                 onClick={() => handleOpenEditExpense(item)}
                                 className="retro-btn-secondary w-8 h-8 p-0 flex items-center justify-center min-h-[32px] min-w-[32px]"
                                 title="Edit Expense"
-                                aria-label="Edit Expense"
+                                aria-label={incoming ? "Edit Income" : "Edit Expense"}
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
                               </button>
@@ -378,7 +396,7 @@ export default function DashboardPage() {
                                 onClick={() => setDeletingExpenseId(item._id)}
                                 className="retro-btn-danger w-8 h-8 p-0 flex items-center justify-center min-h-[32px] min-w-[32px]"
                                 title="Delete Expense"
-                                aria-label="Delete Expense"
+                                aria-label={incoming ? "Delete Income" : "Delete Expense"}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -404,15 +422,16 @@ export default function DashboardPage() {
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
         onSuccess={fetchExpenses}
-        categories={categories}
+        income={incomeMode}
+        categories={incomeMode ? incomeCategories : categories}
         editingExpense={editingExpense}
       />
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={!!deletingExpenseId}
-        title="DELETE EXPENSE"
-        message="Are you sure you want to delete this expense record? This action cannot be undone."
+        title="DELETE ENTRY"
+        message="Are you sure you want to delete this entry? This action cannot be undone."
         onClose={() => setDeletingExpenseId(null)}
         onConfirm={handleDeleteExpense}
         loading={deleteLoading}

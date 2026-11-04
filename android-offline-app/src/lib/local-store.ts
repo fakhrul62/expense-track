@@ -1,3 +1,4 @@
+import { INCOME_SOURCES, isIncomeCategory } from "@/lib/income";
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { openDB, type DBSchema } from "idb";
 import type { CategoryType, ExpenseItem } from "@/components/ExpenseModal";
@@ -189,16 +190,19 @@ export function initializeStore(): Promise<void> {
     for (const category of defaults) {
       if (!existing.some(c => c._id === category._id)) await put("categories", { ...category, isDefault: true, createdAt: now, updatedAt: now });
     }
+    for (const [id, name, icon] of INCOME_SOURCES) {
+      if (!existing.some(c => c._id === id)) await put('categories', { _id: id, name: 'Income: ' + name, icon, isDefault: false, createdAt: now, updatedAt: now });
+    }
     if (!isNative()) void navigator.storage?.persist?.().catch(() => false);
   })().catch(error => { ready = undefined; throw error; });
 }
-export async function getCategories(): Promise<Category[]> {
+async function allCategories(): Promise<Category[]> {
   await initializeStore();
   return (await list("categories") as Category[]).sort((a, b) => Number(b.isDefault) - Number(a.isDefault) || a.createdAt.localeCompare(b.createdAt) || a.name.localeCompare(b.name));
 }
-export async function getExpenses(month: string): Promise<ExpenseItem[]> {
+export async function getTransactions(month?: string): Promise<ExpenseItem[]> {
   await initializeStore();
-  const [expenses, categories] = await Promise.all([list("expenses", month) as Promise<Expense[]>, getCategories()]);
+  const [expenses, categories] = await Promise.all([list("expenses", month) as Promise<Expense[]>, allCategories()]);
   const byId = new Map(categories.map(c => [c._id, c]));
   return expenses.sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
     .map(e => ({ ...e, categoryId: byId.get(e.categoryId) ?? e.categoryId }));
@@ -215,6 +219,7 @@ export async function saveExpense(input: { amount: number; categoryId: string; n
 export async function addCategory(name: string, icon: string) {
   const categories = await getCategories();
   name = name.trim();
+  if (name.startsWith("Income: ")) throw new Error("This name is reserved for income sources.");
   if (!name || name.length > 40) throw new Error("Use a category name between 1 and 40 characters.");
   if (categories.some(c => c.name.toLowerCase() === name.toLowerCase())) throw new Error("A category with this name already exists.");
   if (icon.length > 16) throw new Error("Choose a single emoji for the category.");
@@ -222,4 +227,14 @@ export async function addCategory(name: string, icon: string) {
   await put("categories", { _id: crypto.randomUUID(), name, icon: icon || "🏷️", isDefault: false, createdAt: now, updatedAt: now });
 }
 export const deleteExpense = (id: string) => remove("expenses", id);
-export const deleteCategory = (id: string) => remove("categories", id);
+export const deleteCategory = (id: string) => { if (isIncomeCategory(id)) throw new Error("Income sources cannot be deleted."); return remove("categories", id); };
+
+export async function getCategories() { return (await allCategories()).filter(c => !isIncomeCategory(c._id)); }
+export async function getIncomeCategories() { return (await allCategories()).filter(c => isIncomeCategory(c._id)).sort((a,b) => INCOME_SOURCES.findIndex(([id]) => id === a._id) - INCOME_SOURCES.findIndex(([id]) => id === b._id)).map(c => ({ ...c, name: c.name.replace(/^Income: /, '') })); }
+export async function getExpenses(month: string) { return (await getTransactions(month)).filter(e => !isIncomeCategory(e.categoryId)); }
+export async function getBalance() {
+  const entries = (await getTransactions()).filter(e => e.date <= localDate());
+  const received = entries.filter(e => isIncomeCategory(e.categoryId)).reduce((sum,e) => sum + Math.round(e.amount*100),0);
+  const spent = entries.filter(e => !isIncomeCategory(e.categoryId)).reduce((sum,e) => sum + Math.round(e.amount*100),0);
+  return { received: received/100, spent: spent/100, available: (received-spent)/100 };
+}

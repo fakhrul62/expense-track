@@ -1,3 +1,4 @@
+import { INCOME_SOURCES, isIncomeCategory } from "@/lib/income";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { accountCors, accountReply, authenticatedAccount } from "@/lib/account-server";
@@ -17,6 +18,8 @@ function mutation(value: unknown): SyncMutation {
   const common = { _id: item.id, createdAt: record.createdAt, updatedAt: record.updatedAt };
   if (item.store === "categories") {
     if (typeof record.name !== "string" || !record.name.trim() || record.name.trim().length > 40 || typeof record.icon !== "string" || record.icon.length > 16 || typeof record.isDefault !== "boolean" || record.isDefault !== item.id.startsWith("default-")) throw new Error("Invalid category");
+    const income = INCOME_SOURCES.find(([id]) => id === item.id);
+    if ((income && record.name !== 'Income: ' + income[1]) || (!income && record.name.startsWith('Income: '))) throw new Error('Reserved income source');
     const defaults: Record<string, string> = { "default-bus": "Bus", "default-rickshaw": "Rickshaw", "default-metro": "Metro", "default-food": "Food" };
     if (record.isDefault && record.name !== defaults[item.id]) throw new Error("Invalid default category");
     result.record = { ...common, name: record.name.trim(), icon: record.icon, isDefault: record.isDefault };
@@ -104,7 +107,7 @@ export async function syncHandler(req: NextRequest) {
           }
           let keepCategory = false;
           if (change.deleted && change.store === "categories") {
-            keepCategory = id.startsWith("default-") || Boolean(await records.findOne({ userId, store: "expenses", deleted: false, "record.categoryId": id }, options));
+            keepCategory = isIncomeCategory(id) || id.startsWith("default-") || Boolean(await records.findOne({ userId, store: "expenses", deleted: false, "record.categoryId": id }, options));
             if (keepCategory) warnings.add("A category was kept because it contains synced expenses.");
           }
           if (!keepCategory) {

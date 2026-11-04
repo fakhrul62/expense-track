@@ -1,9 +1,7 @@
-EXPTRACK 1.3.1 for Android
+EXPTRACK 1.4.0
 
-Install EXPTRACK-1.3.1.apk over your existing EXPTRACK to preserve local expenses. Keep the current app installed; do not uninstall first.
+Install EXPTRACK-1.4.0.apk over your existing app to preserve records. Do not uninstall first.
 
-Android 7.0+ and Android System WebView/Chrome 111+ are required. Google sign-in needs Google Play services. Sign into the same account on the app and site to sync expenses and categories. Offline changes upload when the app reconnects or reopens online.
+Update all devices before using Add money. Available balance is money received minus spending dated through today, across all months. Future entries do not affect today's balance. Sign into the same account on app and website for sync. Offline changes upload when the app reconnects or reopens online.
 
-Allow notifications to receive the daily reminder around 8:30 PM local time. This update includes a white status icon and the EXPTRACK logo in the notification card. Android battery settings can delay delivery.
-
-Source and validation: https://github.com/fakhrul62/expense-track/tree/main/android-offline-app
+Android 7.0+ and WebView/Chrome 111+ required. Google sign-in needs Google Play services. The daily reminder is around 8:30 PM; allow notifications.

@@ -60,12 +60,12 @@ try {
     await page.getByRole('button', { name: 'SAVE', exact: true }).click();
     await page.getByText(note, { exact: true }).waitFor();
   }
-  await page.getByText(/Day Total:/).first().waitFor();
-  const totals = ['Day Total: \u09f355.00'];
-  await expect.poll(() => page.getByText(/Day Total:/).allTextContents()).toEqual(totals);
+  await page.getByText(/Net spent:/).first().waitFor();
+  const totals = ['Net spent: \u09f355.00'];
+  await expect.poll(() => page.getByText(/Net spent:/).allTextContents()).toEqual(totals);
   await page.getByRole('button', { name: 'Grid view', exact: true }).click();
   assert.equal(await page.locator('[data-entry-view="grid"] .expense-row').count(), 2);
-  await expect.poll(() => page.getByText(/Day Total:/).allTextContents()).toEqual(totals);
+  await expect.poll(() => page.getByText(/Net spent:/).allTextContents()).toEqual(totals);
   for (const width of native ? [360] : [320, 360, 768]) {
     if (!native) await page.setViewportSize({ width, height: 780 });
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `overflow at ${width}`);
@@ -82,7 +82,7 @@ try {
   await page.getByRole('button', { name: 'YES, DELETE', exact: true }).click();
   await page.getByText('Daily feature one', { exact: true }).waitFor({ state: 'hidden' });
   await page.getByRole('button', { name: 'List view', exact: true }).click();
-  assert.equal(await page.locator('[data-entry-view="list"] .expense-row').count(), 1);
+  await expect.poll(() => page.locator('[data-entry-view="list"] .expense-row').count()).toBe(1);
   await page.goto(`${base}/settings/`);
   if (native) {
     const pending = () => page.evaluate(() => window.Capacitor.Plugins.LocalNotifications.getPending());

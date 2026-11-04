@@ -18,6 +18,7 @@ export default function BottomNav({ onOpenAddExpense }: BottomNavProps) {
         {/* Home Tab */}
         <Link
           href="/"
+          aria-current={pathname === "/" ? "page" : undefined}
           className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] px-3 py-1 font-mono-retro text-xs border-2 transition-all duration-150 active:translate-x-0.5 active:translate-y-0.5 ${
             pathname === "/"
               ? "bg-[#1C1917] text-white border-[#1C1917] dark:bg-[#FEF08A] dark:text-[#1C1917] dark:border-[#FEF08A] shadow-[2px_2px_0px_0px_#EA580C]"
@@ -40,6 +41,7 @@ export default function BottomNav({ onOpenAddExpense }: BottomNavProps) {
         {/* Settings Tab */}
         <Link
           href="/settings"
+          aria-current={pathname === "/settings" ? "page" : undefined}
           className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] px-3 py-1 font-mono-retro text-xs border-2 transition-all duration-150 active:translate-x-0.5 active:translate-y-0.5 ${
             pathname === "/settings"
               ? "bg-[#1C1917] text-white border-[#1C1917] dark:bg-[#FEF08A] dark:text-[#1C1917] dark:border-[#FEF08A] shadow-[2px_2px_0px_0px_#EA580C]"

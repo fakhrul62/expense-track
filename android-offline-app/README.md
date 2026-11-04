@@ -4,13 +4,18 @@ Expense tracker packaged with Capacitor. Android saves expenses and categories i
 
 ## Install
 
-Copy `dist/EXPTRACK-1.3.1.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
+Copy `dist/EXPTRACK-1.4.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
 
 Requires Android 7.0 (API 24) or newer and Android System WebView/Chrome 111 or newer. An outdated WebView shows an update instruction screen. Broad compatibility is targeted; performance on every Android device has not been verified.
 
 Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.users. Opaque server sessions are hashed in auth_sessions. Synced expenses and categories restore after signing into the same account. Uninstalling or clearing app data loses changes that have not synced. Installing a newer APK signed with the same key preserves local records.
 
 ## Features
+
+- Add money received: Salary, Loan received, Owed money repaid, Freelance and Other. Edit/delete income just like spending.
+- Available balance is all received money minus all expenses dated through today, across all months. Future entries are shown in their month but excluded from current balance. Loans received add cash; debt repayment schedules are not tracked.
+- Income uses reserved stable category identities in the existing transactional SQLite/IndexedDB storage and cloud outbox. No destructive database migration is needed. Update all Android installations to 1.4.0: earlier versions cannot distinguish these income entries from spending.
+- Live interface preview: run npm run dev -- --port 3005 and open http://localhost:3005.
 
 - Create, edit, delete, and browse expenses by month.
 - Sign in or sign up with Google, or use email and password. Native Google sign-in requires Google Play services.
@@ -53,4 +58,4 @@ The browser preview uses IndexedDB; Android uses SQLite through `ExpenseStorePlu
 
 The account API is in src/app/api/auth/[action]/route.ts; cloud sync is in src/app/api/sync/route.ts. Configure MONGODB_URI and GOOGLE_CLIENT_ID on the server. Android credentials use Keystore-backed AES-GCM storage; browser authentication uses an HTTP-only cookie. Sessions last 30 days. The first signed-in account keeps the pre-login local expenses; other accounts receive separate local databases. Sign-out preserves records for returning accounts. Existing SQLite and IndexedDB databases migrate their records into the durable sync queue. The web and mobile builds are separate: mobile export stages source without server routes. Original server routes and login screens are preserved in `archive/` for reference and excluded from the Android export.
 
-Google configuration is documented in GOOGLE-SETUP.md. Current release evidence is in VALIDATION-1.3.1.md; Google sign-in limitations are documented in VALIDATION-1.3.0.md.
+Google configuration is documented in GOOGLE-SETUP.md. Current release evidence is in VALIDATION-1.4.0.md; Google sign-in limitations are documented in VALIDATION-1.3.0.md.

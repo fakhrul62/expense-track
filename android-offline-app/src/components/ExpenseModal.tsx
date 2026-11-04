@@ -22,6 +22,7 @@ export interface ExpenseItem {
 }
 
 interface ExpenseModalProps {
+  income?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -34,6 +35,7 @@ export default function ExpenseModal(props: ExpenseModalProps) {
 }
 
 function ExpenseForm({
+  income = false,
   isOpen,
   onClose,
   onSuccess,
@@ -95,7 +97,7 @@ function ExpenseForm({
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
         <motion.div
-          role="dialog" aria-modal="true" aria-label={editingExpense ? "Edit expense" : "New expense"}
+          role="dialog" aria-modal="true" aria-label={income ? (editingExpense ? "Edit income" : "Add money") : editingExpense ? "Edit expense" : "New expense"}
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
@@ -106,7 +108,7 @@ function ExpenseForm({
           <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3 mb-5">
             <h2 className="font-mono-retro font-bold text-lg text-[#1C1917] dark:text-[#FBF7EE] flex items-center gap-2">
               <span className="bg-[#FEF08A] dark:bg-[#854D0E] text-[#1C1917] dark:text-[#FBF7EE] px-2 py-0.5 border border-[#1C1917] dark:border-[#3F3F46]">
-                {editingExpense ? "EDIT EXPENSE" : "+ NEW EXPENSE"}
+                {income ? (editingExpense ? "EDIT INCOME" : "+ ADD MONEY") : editingExpense ? "EDIT EXPENSE" : "+ NEW EXPENSE"}
               </span>
             </h2>
             <button
