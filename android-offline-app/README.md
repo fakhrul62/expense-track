@@ -4,13 +4,15 @@ Expense tracker packaged with Capacitor. Android saves expenses and categories i
 
 ## Install
 
-Copy `dist/EXPTRACK-1.7.1.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
+Copy `dist/EXPTRACK-1.8.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records. Version 1.8.0 must be installed once to enable future updates through Config.
 
 Requires Android 7.0 (API 24) or newer and Android System WebView/Chrome 111 or newer. An outdated WebView shows an update instruction screen. Broad compatibility is targeted; performance on every Android device has not been verified.
 
 Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.users. Opaque server sessions are hashed in auth_sessions. Synced expenses and categories restore after signing into the same account. Uninstalling or clearing app data loses changes that have not synced. Installing a newer APK signed with the same key preserves local records.
 
 ## Features
+
+- Config > App Updates checks the public GitHub repository, downloads a verified newer APK and opens Android installer. The first update can require allowing EXPTRACK to install apps from this source. Android asks for installation approval. APK version, package, checksum and signer must match; app data stays in place. See UPDATES.md for release publishing and test details.
 
 - Loans page: total outstanding, original borrowing, partial/full repayments, cleared history, and automatic recognition of existing Loan received entries. Managed loan records keep their repayment history instead of being edited/deleted as ordinary cash entries.
 - Add money received: Salary, Loan received, Owed money repaid, Freelance and Other. Edit/delete income just like spending.

@@ -1,0 +1,15 @@
+# Android updates from Config
+
+Install EXPTRACK 1.8.0 once to gain Config > App Updates. Check for updates reads the public EXPTRACK repository; Download & install downloads the APK inside the app and opens Android's installer. On Android 8+, the first install can require allowing EXPTRACK to install apps from this source in system Settings. Return to EXPTRACK and tap Install update after granting permission. Installation requires the Android confirmation; cancelling leaves the verified download available to retry.
+
+The repository is fixed to fakhrul62/expense-track, main, android-offline-app/. No GitHub credentials are embedded or requested. The primary update descriptor is android-update.json with version, code and sha256. APKs use dist/EXPTRACK-<version>.apk. The SHA-256 and signed Android archive package/version must match the descriptor; the downloaded APK's signer must equal the installed app's signer, and its versionCode must be greater. Only HTTPS GitHub hosts are accepted. Files stay in the private app cache and are shared with the installer through a temporary read-only FileProvider URI. Same package/signing key installation preserves existing app data.
+
+Older repo snapshots without android-update.json are supported by reading the published Android Gradle version and versioned APK checksum file. This fallback and the normal descriptor use public raw downloads, avoiding GitHub API authentication and quota limits. Metadata is read on an explicit Check for updates; no automatic installation or background polling is added.
+
+## Publishing a release
+
+Keep the release signing key. Increment package.json/package-lock.json and Android versionName/versionCode, and update the APK filename in scripts/build-android.ps1. Run npm run android:build. The build verifies signature/alignment, writes the APK and .sha256, and generates android-update.json with its checksum and version. Publish source, android-update.json, the versioned APK and its checksum together under android-offline-app/. Keep previous versioned APKs unchanged. The current installed version is read from Android, not web package metadata.
+
+## Validation
+
+Browser Config shows an Android-only update explanation. Android instrumentation AppUpdateTest uses a candidate/newer debug APK, a wrong-package APK and a deliberately re-signed APK copied to files/update-fixtures/ in an older debug test installation. It verifies the archive/security checks and prepares a cached update. Fixtures remain under build/update-tests and are not published. A live GitHub version/checksum check and real APK download were exercised. The release APK was correctly rejected by the debug app because the package names differ. A matching debug upgrade was then installed via Config, system installation-source permission and Android's Update confirmation. VersionCode changed from 13 to 15 and a SQLite spending record with amount 12.34 survived. Reinstalling the same version through the updater was rejected. No production account data was used in the test.

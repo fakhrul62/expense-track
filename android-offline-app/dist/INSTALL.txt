@@ -1,5 +1,7 @@
-EXPTRACK 1.7.1
+EXPTRACK 1.8.0
 
-Install EXPTRACK-1.7.1.apk over your existing app; do not uninstall.
+Install EXPTRACK-1.8.0.apk over your existing app; do not uninstall.
 
-Expense popup has extra top space for notched phones. + Add Another remains beside Close. Each new expense stacks underneath the previous card; scroll the cards while header and Save all stay visible. Every entry has separate amount, date, category and note fields. Existing records, login, reminders and atomic batch saving are preserved.
+This build adds Config > App Updates. Install it once; later app versions can be checked, downloaded and opened in Android installer from Config. Android asks for installation approval and may require Allow from this source for EXPTRACK on the first update. Existing records, login and settings remain in place.
+
+Publish the generated android-update.json with each new versioned APK and checksum.

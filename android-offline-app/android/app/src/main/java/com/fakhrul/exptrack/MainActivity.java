@@ -11,6 +11,7 @@ import java.io.InputStream;
 public class MainActivity extends BridgeActivity {
     @Override public void onCreate(Bundle savedInstanceState) {
         registerPlugin(ExpenseStorePlugin.class);
+        registerPlugin(AppUpdaterPlugin.class);
         registerPlugin(GoogleAuthPlugin.class);
         super.onCreate(savedInstanceState);
         bridge.setWebViewClient(new BridgeWebViewClient(bridge) {

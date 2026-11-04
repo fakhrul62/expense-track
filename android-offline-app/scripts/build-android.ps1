@@ -10,7 +10,7 @@ if (!$env:ANDROID_HOME) { throw 'Set ANDROID_HOME to an Android SDK with platfor
 $sdkPath = $env:ANDROID_HOME.Replace('\', '/')
 [IO.File]::WriteAllText("$PWD\android\local.properties", "sdk.dir=$sdkPath`n")
 New-Item -ItemType Directory -Force .keys,dist,build/apk | Out-Null
-$apkName = 'EXPTRACK-1.7.1.apk'
+$apkName = 'EXPTRACK-1.8.0.apk'
 $stagedApk = "build/apk/$apkName"
 $finalApk = "dist/$apkName"
 if (!(Test-Path .keys/release.json)) {
@@ -49,5 +49,9 @@ try {
     if ((Get-FileHash $stagedApk).Hash -ne (Get-FileHash $finalApk).Hash) { throw 'Delivered APK differs from verified APK.' }
     $hash = Get-FileHash $finalApk -Algorithm SHA256
     "$($hash.Hash.ToLower())  $apkName" | Set-Content "dist/$apkName.sha256" -Encoding ascii
+    $releaseVersion = (Get-Content package.json | ConvertFrom-Json).version
+    $releaseCode = [int]([regex]::Match((Get-Content android/app/build.gradle -Raw), 'versionCode\s+(\d+)').Groups[1].Value)
+    if ($apkName -ne "EXPTRACK-$releaseVersion.apk" -or $releaseCode -lt 1) { throw 'Release version metadata does not match the APK.' }
+    @{ version = $releaseVersion; code = $releaseCode; sha256 = $hash.Hash.ToLower() } | ConvertTo-Json | Set-Content android-update.json -Encoding ascii
     $hash | Format-List
 } finally { Remove-Item Env:EXPTRACK_SIGNING_PASSWORD -ErrorAction SilentlyContinue }
