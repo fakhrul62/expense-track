@@ -221,6 +221,7 @@ html.dark [class*="bg-[#854D0E]"], html.dark .bottom-nav-bg [aria-current="page"
 html.dark .bottom-nav-bg a { border-radius: 7px; border-width: 1px; }
 html.dark .bottom-nav-bg button { border-radius: 12px; box-shadow: 0 3px 10px #00000030 !important; }
 html.dark [aria-pressed="true"] { background: #3D2D22 !important; color: #FFD1AF !important; border-color: #AC7146 !important; }
+html.dark [aria-pressed="true"]:hover { background: #4B3627 !important; color: #FFD1AF !important; }
 html.dark .stat-card [class*="text-amber"], html.dark .stat-card [class*="text-[#FEF08A]"] { color: #ECEDEE !important; }
 html.dark .stat-card [class*="absolute"] { background: #2B333A !important; color: #C3CBD2 !important; border-color: #424A52 !important; }
 html.dark [role="dialog"] { background: #202428 !important; color: #ECEDEE; border-color: #424A52 !important; border-radius: 14px 14px 0 0; box-shadow: 0 -6px 32px #00000040 !important; }

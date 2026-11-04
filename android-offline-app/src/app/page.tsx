@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import { loanDetails, transactionNote } from "@/lib/loan-ledger";
 import { isIncomeCategory, incomeLabel } from "@/lib/income";
 
 
@@ -368,9 +370,9 @@ export default function DashboardPage() {
                                 {incoming && <span className="text-green-700 dark:text-green-300 mr-1">INCOME</span>}
                                 {catName}
                               </h4>
-                              {item.note && (
+                              {transactionNote(item) && (
                                 <p className="font-sans text-xs opacity-75 truncate mt-0.5">
-                                  {item.note}
+                                  {transactionNote(item)}
                                 </p>
                               )}
                             </div>
@@ -384,6 +386,7 @@ export default function DashboardPage() {
 
                             {/* Action icons */}
                             <div className="flex items-center gap-1">
+                              {loanDetails(item) ? <Link href="/loans" className="retro-btn-secondary px-2 text-[10px] font-mono-retro">LOAN</Link> : <>
                               <button
                                 onClick={() => handleOpenEditExpense(item)}
                                 className="retro-btn-secondary w-8 h-8 p-0 flex items-center justify-center min-h-[32px] min-w-[32px]"
@@ -399,7 +402,7 @@ export default function DashboardPage() {
                                 aria-label={incoming ? "Delete Income" : "Delete Expense"}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                              </button></>}
                             </div>
                           </div>
                         </motion.div>

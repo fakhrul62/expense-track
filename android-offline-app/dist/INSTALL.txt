@@ -1,3 +1,7 @@
-EXPTRACK 1.4.2
+EXPTRACK 1.5.0
 
-Install EXPTRACK-1.4.2.apk over your existing app; do not uninstall. This update matches the available balance font to the other totals and improves received/spent numeric layout. Records, income calculations and sync behavior are unchanged.
+Install EXPTRACK-1.5.0.apk over your existing app; do not uninstall.
+
+Adds Loans: borrowed amounts, outstanding totals, partial and full repayments, and cleared history. Money received increases available cash; repayments reduce it. Outstanding debt is shown separately. Choose Existing debt only when no new cash should be recorded. Existing Loan received entries appear automatically without double counting.
+
+Records and account sync use the existing ledger and are preserved when updating with this APK.

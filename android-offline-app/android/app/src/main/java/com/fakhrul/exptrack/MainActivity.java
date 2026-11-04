@@ -18,7 +18,7 @@ public class MainActivity extends BridgeActivity {
                 String path = request.getUrl().getPath();
                 if ("localhost".equals(request.getUrl().getHost()) && path != null) {
                     String asset = null;
-                    boolean html = path.matches("/(settings|login|register|privacy)/?");
+                    boolean html = path.matches("/(settings|login|register|privacy|loans)/?");
                     if (html) asset = "public/" + path.replaceAll("^/|/$", "") + "/index.html";
                     else if (path.endsWith(".__PAGE__.txt")) asset = "public" + path.replace(".__PAGE__.txt", "/__PAGE__.txt");
                     if (asset != null) {

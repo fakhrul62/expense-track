@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Plus, Settings } from "lucide-react";
+import { Home, Plus, Settings, HandCoins } from "lucide-react";
 
 interface BottomNavProps {
   onOpenAddExpense: () => void;
@@ -29,6 +29,7 @@ export default function BottomNav({ onOpenAddExpense }: BottomNavProps) {
           <span className="text-[10px] font-bold">HOME</span>
         </Link>
 
+        <Link href="/loans" aria-current={pathname === "/loans" ? "page" : undefined} className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] px-3 py-1 border-2 font-mono-retro ${pathname === "/loans" ? "retro-btn" : "retro-btn-secondary"}`}><HandCoins className="w-5 h-5 mb-0.5" /><span className="text-[10px] font-bold">LOANS</span></Link>
         {/* Floating Thumb-Reachable Add Button */}
         <button
           onClick={onOpenAddExpense}
