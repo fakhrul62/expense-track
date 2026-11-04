@@ -207,9 +207,9 @@ export default function DashboardPage() {
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 pb-12 space-y-5">
         <SyncStatus />
         <section className="retro-box-lg p-4 space-y-3" aria-label="Your balance">
-          <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-mono-retro">AVAILABLE BALANCE</p><p data-testid="available-balance" className="text-2xl font-bold">৳ {balance.available.toLocaleString('en-US', {minimumFractionDigits:2})}</p></div>
+          <div className="flex items-center justify-between gap-3"><div className="min-w-0"><p className="text-xs font-mono-retro">AVAILABLE BALANCE</p><p data-testid="available-balance" className="font-mono-retro font-black text-xl sm:text-2xl tabular-nums break-all">৳ {balance.available.toLocaleString('en-US', {minimumFractionDigits:2})}</p></div>
           <button className="retro-btn px-3 text-xs shrink-0" onClick={() => { setIncomeMode(true); setEditingExpense(null); setIsExpenseModalOpen(true); }}>+ ADD MONEY</button></div>
-          <div className="grid grid-cols-2 gap-2 text-xs"><p>Received: ৳ {balance.received.toLocaleString('en-US',{minimumFractionDigits:2})}</p><p>Spent: ৳ {balance.spent.toLocaleString('en-US',{minimumFractionDigits:2})}</p></div>
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono-retro tabular-nums"><p><span className="block text-[10px] opacity-70">Received</span><span className="break-all">৳ {balance.received.toLocaleString('en-US',{minimumFractionDigits:2})}</span></p><p><span className="block text-[10px] opacity-70">Spent</span><span className="break-all">৳ {balance.spent.toLocaleString('en-US',{minimumFractionDigits:2})}</span></p></div>
           <p className="text-xs opacity-70">All entries through today · carries across months</p>
         </section>
         {error && <div role="alert" className="retro-box p-3 text-sm text-red-700">{error}<button className="retro-btn-secondary ml-2 px-3" onClick={fetchExpenses}>Retry</button></div>}

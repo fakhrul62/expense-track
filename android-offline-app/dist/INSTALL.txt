@@ -1,5 +1,3 @@
-EXPTRACK 1.4.1
+EXPTRACK 1.4.2
 
-Install EXPTRACK-1.4.1.apk over your existing app; do not uninstall. This update fixes the opaque logo tile on the system launch screen and supplies matching light/dark launch backgrounds.
-
-Your records and account remain in place. If the launcher still shows a cached old launch icon after updating, restart the phone once.
+Install EXPTRACK-1.4.2.apk over your existing app; do not uninstall. This update matches the available balance font to the other totals and improves received/spent numeric layout. Records, income calculations and sync behavior are unchanged.
