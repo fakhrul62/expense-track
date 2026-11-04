@@ -1,7 +1,5 @@
-EXPTRACK 1.7.0
+EXPTRACK 1.7.1
 
-Install EXPTRACK-1.7.0.apk over your existing app; do not uninstall.
+Install EXPTRACK-1.7.1.apk over your existing app; do not uninstall.
 
-In the expense popup, fill one expense and tap + Add Another beside the close button. On phones, the popup fills the app screen and the Add Another button stays above the number pad. Review expenses lets you edit or remove drafts. Save all records the entire batch and updates your totals. You can enter up to 20 expenses, each with its own category, date and note. A failed save keeps your drafts and does not save only part of the batch.
-
-Income and editing an existing expense remain single-entry forms. Existing records, login and custom reminders are preserved when updating.
+Expense popup has extra top space for notched phones. + Add Another remains beside Close. Each new expense stacks underneath the previous card; scroll the cards while header and Save all stay visible. Every entry has separate amount, date, category and note fields. Existing records, login, reminders and atomic batch saving are preserved.
