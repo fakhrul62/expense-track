@@ -5,7 +5,7 @@ import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { useAuth } from "@/context/AuthContext";
-import { initializeDailyReminder, syncDailyReminder } from "@/lib/daily-reminder";
+import { initializeDailyReminder, syncDailyReminder, isSpendingReminder } from "@/lib/daily-reminder";
 
 export default function NativeLifecycle() {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function NativeLifecycle() {
     const refresh = () => { void syncDailyReminder(user.id).catch(report); };
     window.addEventListener("exptrack:resume", refresh);
     const action = LocalNotifications.addListener("localNotificationActionPerformed", ({ notification }) => {
-      if (notification.id === 830) router.push("/");
+      if (isSpendingReminder(notification.id)) router.push("/");
     });
     return () => { window.removeEventListener("exptrack:resume", refresh); void action.then(listener => listener.remove()); };
   }, [user, router]);

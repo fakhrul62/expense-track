@@ -5,7 +5,6 @@ import { HandCoins, Plus, X, Check, ChevronDown } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import ExpenseModal, { type CategoryType } from "@/components/ExpenseModal";
-import SyncStatus from "@/components/SyncStatus";
 import { addLoan, repayLoan, getTransactions, getCategories, localDate, errorMessage } from "@/lib/local-store";
 import { loanSummaries, type LoanSummary } from "@/lib/loan-ledger";
 import { useAuth } from "@/context/AuthContext";
@@ -50,7 +49,6 @@ export default function LoansPage() {
   return <div className="min-h-screen pb-32 md:pb-12">
     <Navbar />
     <main className="max-w-2xl mx-auto px-4 py-5 space-y-5">
-      <SyncStatus />
       <div className="flex items-center justify-between gap-3">
         <div><h1 className="font-mono-retro font-black text-xl flex items-center gap-2"><HandCoins size={24} /> LOANS</h1><p className="text-xs opacity-70 mt-1">What you borrowed. What you’ve paid back.</p></div>
         <button className="retro-btn px-3 text-xs flex items-center gap-1 shrink-0" onClick={() => setForm("add")}><Plus size={16} /> ADD LOAN</button>

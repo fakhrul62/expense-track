@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { Settings, Plus, Sun, Moon, HandCoins } from "lucide-react";
+import { Plus, Sun, Moon, HandCoins } from "lucide-react";
 
 interface NavbarProps {
   onOpenAddExpense?: () => void;
@@ -55,13 +55,7 @@ export default function Navbar({ onOpenAddExpense }: NavbarProps) {
             )}
           </button>
 
-          <Link
-            href="/settings"
-            className="retro-btn-secondary px-2.5 py-1.5 text-xs font-mono-retro rounded-none min-h-[38px] min-w-[38px] md:min-h-[44px] md:min-w-[44px] flex items-center justify-center"
-            title="Settings"
-          >
-            <Settings className="w-4 h-4" />
-          </Link>
+          <div className="hidden md:block"><Link href="/settings" className="retro-btn-secondary flex items-center px-3 text-xs font-mono-retro" title="Settings">CONFIG</Link></div>
 
 
         </div>

@@ -11,7 +11,6 @@ import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import ExpenseModal, { CategoryType, ExpenseItem } from "@/components/ExpenseModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
-import SyncStatus from "@/components/SyncStatus";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -207,16 +206,8 @@ export default function DashboardPage() {
       <Navbar onOpenAddExpense={handleOpenAddExpense} />
 
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-4 pb-12 space-y-5">
-        <SyncStatus />
-        <section className="retro-box-lg p-4 space-y-3" aria-label="Your balance">
-          <div className="flex items-center justify-between gap-3"><div className="min-w-0"><p className="text-xs font-mono-retro">AVAILABLE BALANCE</p><p data-testid="available-balance" className="font-mono-retro font-black text-xl sm:text-2xl tabular-nums break-all">৳ {balance.available.toLocaleString('en-US', {minimumFractionDigits:2})}</p></div>
-          <button className="retro-btn px-3 text-xs shrink-0" onClick={() => { setIncomeMode(true); setEditingExpense(null); setIsExpenseModalOpen(true); }}>+ ADD MONEY</button></div>
-          <div className="grid grid-cols-2 gap-2 text-xs font-mono-retro tabular-nums"><p><span className="block text-[10px] opacity-70">Received</span><span className="break-all">৳ {balance.received.toLocaleString('en-US',{minimumFractionDigits:2})}</span></p><p><span className="block text-[10px] opacity-70">Spent</span><span className="break-all">৳ {balance.spent.toLocaleString('en-US',{minimumFractionDigits:2})}</span></p></div>
-          <p className="text-xs opacity-70">All entries through today · carries across months</p>
-        </section>
-        {error && <div role="alert" className="retro-box p-3 text-sm text-red-700">{error}<button className="retro-btn-secondary ml-2 px-3" onClick={fetchExpenses}>Retry</button></div>}
         {/* Month Selector Bar */}
-        <section className="retro-box p-3 flex items-center justify-between">
+        <section className="retro-box month-selector flex items-center justify-between">
           <button
             onClick={() => changeMonth(-1)}
             className="retro-btn-secondary p-2 min-h-[38px] min-w-[38px]"
@@ -238,7 +229,12 @@ export default function DashboardPage() {
             <ChevronRight className="w-5 h-5" />
           </button>
         </section>
-
+        <section className="retro-box-lg p-4 space-y-3" aria-label="Your balance">
+          <div className="flex items-center justify-between gap-3"><div className="min-w-0"><p className="text-xs font-mono-retro">AVAILABLE BALANCE</p><p data-testid="available-balance" className="font-mono-retro font-black text-xl sm:text-2xl tabular-nums break-all">৳ {balance.available.toLocaleString('en-US', {minimumFractionDigits:2})}</p></div>
+          <button className="retro-btn px-3 text-xs shrink-0" onClick={() => { setIncomeMode(true); setEditingExpense(null); setIsExpenseModalOpen(true); }}>+ ADD MONEY</button></div>
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono-retro tabular-nums"><p><span className="block text-[10px] opacity-70">Received</span><span className="break-all">৳ {balance.received.toLocaleString('en-US',{minimumFractionDigits:2})}</span></p><p><span className="block text-[10px] opacity-70">Spent</span><span className="break-all">৳ {balance.spent.toLocaleString('en-US',{minimumFractionDigits:2})}</span></p></div>
+        </section>
+        {error && <div role="alert" className="retro-box p-3 text-sm text-red-700">{error}<button className="retro-btn-secondary ml-2 px-3" onClick={fetchExpenses}>Retry</button></div>}
         {/* Totals Section */}
         <section className="grid grid-cols-2 gap-3 sm:gap-4">
           {/* Daily Total Box */}
@@ -268,7 +264,6 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <p className="text-xs font-mono-retro">Month received: ৳ {expenses.filter(e => isIncomeCategory(e.categoryId)).reduce((n,e) => n + Math.round(e.amount*100),0)/100} · Future entries are excluded from available balance.</p>
         {/* Expenses Header & Add trigger */}
         <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-2 pt-2">
           <h2 className="font-mono-retro font-bold text-sm flex items-center gap-2">

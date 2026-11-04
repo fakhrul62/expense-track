@@ -1,3 +1,4 @@
+import { waitForSync } from "./wait-for-sync.mjs";
 ﻿import { chromium, expect } from '@playwright/test';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
@@ -17,7 +18,7 @@ async function cloud(account){const r=await fetch(api+'/api/sync/',{method:'POST
 try{
  await app.evaluate(async()=>{await window.Capacitor.Plugins.ExpenseStore.writeSession({});await window.Capacitor.Plugins.LocalNotifications.cancel({notifications:[{id:830}]});});await app.goto('https://localhost/login/');
  for(const email of emails){const r=await fetch(api+'/api/auth/register/',{method:'POST',headers:{'Content-Type':'application/json','X-EXPTRACK-Client':'android',Origin:'https://localhost'},body:JSON.stringify({name:'Native income test',email,password})});assert.equal(r.status,200);accounts.push(await r.json());}
- await login(app,emails[0]);await app.getByRole('status').filter({hasText:'Synced to your account'}).waitFor();
+ await login(app,emails[0]);await waitForSync(app);
  await connection(false);await add(app,true,'20000','Offline salary '+tag);await add(app,false,'5000','Offline spending '+tag);await expect(app.getByTestId('available-balance')).toHaveText('\u09f3 15,000.00');await app.reload();await expect(app.getByTestId('available-balance')).toHaveText('\u09f3 15,000.00');assert.equal((await cloud(accounts[0])).expenses.length,0);
  await connection(true);await expect.poll(async()=>(await cloud(accounts[0])).expenses.length,{timeout:60000}).toBe(2);await web.goto(webBase+'/login/');await login(web,emails[0]);await expect(web.getByTestId('available-balance')).toHaveText('\u09f3 15,000.00');console.log('PASS: offline native salary and spending survive reload and sync to website with 15000 balance');
  const salary=web.locator('.expense-row').filter({hasText:'Offline salary '+tag});await salary.getByRole('button',{name:'Edit Income',exact:true}).click();await web.getByLabel('Amount',{exact:true}).fill('22000');await web.getByRole('button',{name:'UPDATE',exact:true}).click();await expect.poll(async()=>{await app.evaluate(()=>window.dispatchEvent(new Event('exptrack:resume')));return app.getByTestId('available-balance').innerText();},{timeout:60000}).toBe('\u09f3 17,000.00');

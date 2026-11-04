@@ -1,7 +1,7 @@
-EXPTRACK 1.5.0
+EXPTRACK 1.6.0
 
-Install EXPTRACK-1.5.0.apk over your existing app; do not uninstall.
+Install EXPTRACK-1.6.0.apk over your existing app; do not uninstall.
 
-Adds Loans: borrowed amounts, outstanding totals, partial and full repayments, and cleared history. Money received increases available cash; repayments reduce it. Outstanding debt is shown separately. Choose Existing debt only when no new cash should be recorded. Existing Loan received entries appear automatically without double counting.
+Config now supports 1-6 daily spending reminders with a separate time for each. Choose the count and times, then Save reminder times. Switch reminders on/off from the same section. Times follow the phone local time. Notification permission is required; Android battery restrictions can delay delivery.
 
-Records and account sync use the existing ledger and are preserved when updating with this APK.
+Also includes compact month selection, aligned bottom navigation, and sync status only in Config. Records and login are preserved when updating.

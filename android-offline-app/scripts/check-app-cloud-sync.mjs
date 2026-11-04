@@ -1,3 +1,4 @@
+import { waitForSync } from "./wait-for-sync.mjs";
 ﻿import { chromium, expect } from '@playwright/test';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
@@ -56,7 +57,7 @@ const online = async () => {
   await app.waitForFunction(() => navigator.onLine);
   await app.evaluate(() => window.dispatchEvent(new Event('exptrack:resume')));
 };
-const synced = page => page.getByRole('status').filter({ hasText: 'Synced to your account' }).waitFor();
+const synced = page => waitForSync(page);
 try {
   await app.context().setOffline(false);
   run('shell', 'svc', 'wifi', 'enable'); run('shell', 'svc', 'data', 'enable');

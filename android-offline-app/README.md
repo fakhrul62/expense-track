@@ -4,7 +4,7 @@ Expense tracker packaged with Capacitor. Android saves expenses and categories i
 
 ## Install
 
-Copy `dist/EXPTRACK-1.5.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
+Copy `dist/EXPTRACK-1.6.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
 
 Requires Android 7.0 (API 24) or newer and Android System WebView/Chrome 111 or newer. An outdated WebView shows an update instruction screen. Broad compatibility is targeted; performance on every Android device has not been verified.
 
@@ -23,7 +23,8 @@ Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.
 - Automatic account-specific app/site sync, including edits and deletions. Offline changes persist across restarts. Sync runs while the app is open, on reconnect/resume, and every 30 seconds while visible; Settings also provides Sync now. Closed-app background uploads are not scheduled. For simultaneous edits, the last change received by the server wins.
 - Show/hide the password on sign-in and registration.
 - Switch daily entries between list and grid; the selected view stays saved on this device.
-- Android daily spending notification around 8:30 PM local time, scheduled offline. Allow notifications after signing in; turn the reminder off/on in Settings. Signing out cancels it. Android battery restrictions can delay delivery. Background reminders are not available in the browser preview.
+- Android spending reminders: choose 1-6 daily notifications and a local time for each in Config. Save reminder times to apply changes. The default is one reminder at 8:30 PM. Preferences stay with this account on this device. Switching reminders off or signing out cancels all slots. Allow notifications after signing in; Android battery restrictions can delay delivery. Background reminders are not available in the browser preview.
+- Aligned bottom navigation, compact month selector above balance, and sync status/Sync now only in Config. Mobile Config lives in the bottom navigation; the duplicate header icon is removed.
 - Today's total follows the device's local date, independent of the selected month.
 - Amounts are stored as integer cents in SQLite.
 - Default and custom categories, with protection against deleting categories in use.
