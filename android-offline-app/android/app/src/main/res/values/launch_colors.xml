@@ -1,0 +1,4 @@
+<resources>
+    <color name="exptrack_launch_background">#FBF7EE</color>
+    <bool name="exptrack_light_system_bars">true</bool>
+</resources>

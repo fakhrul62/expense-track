@@ -1,7 +1,5 @@
-EXPTRACK 1.4.0
+EXPTRACK 1.4.1
 
-Install EXPTRACK-1.4.0.apk over your existing app to preserve records. Do not uninstall first.
+Install EXPTRACK-1.4.1.apk over your existing app; do not uninstall. This update fixes the opaque logo tile on the system launch screen and supplies matching light/dark launch backgrounds.
 
-Update all devices before using Add money. Available balance is money received minus spending dated through today, across all months. Future entries do not affect today's balance. Sign into the same account on app and website for sync. Offline changes upload when the app reconnects or reopens online.
-
-Android 7.0+ and WebView/Chrome 111+ required. Google sign-in needs Google Play services. The daily reminder is around 8:30 PM; allow notifications.
+Your records and account remain in place. If the launcher still shows a cached old launch icon after updating, restart the phone once.

@@ -12,17 +12,20 @@
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">#FBF7EE</item>
+        <item name="android:windowBackground">@color/exptrack_launch_background</item>
         <item name="android:forceDarkAllowed">false</item>
     </style>
 
 
-    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+    <style name="AppTheme.LaunchBase" parent="Theme.SplashScreen">
         <item name="android:forceDarkAllowed">false</item>
-        <item name="android:windowBackground">#FBF7EE</item>
-        <item name="windowSplashScreenIconBackgroundColor">#FBF7EE</item>
-        <item name="windowSplashScreenBackground">#FBF7EE</item>
+        <item name="android:windowBackground">@color/exptrack_launch_background</item>
+        <item name="android:windowLightStatusBar">@bool/exptrack_light_system_bars</item>
+        <item name="android:statusBarColor">@color/exptrack_launch_background</item>
+        <item name="android:navigationBarColor">@color/exptrack_launch_background</item>
+        <item name="windowSplashScreenBackground">@color/exptrack_launch_background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/exptrack_icon</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
+    <style name="AppTheme.NoActionBarLaunch" parent="AppTheme.LaunchBase" />
 </resources>

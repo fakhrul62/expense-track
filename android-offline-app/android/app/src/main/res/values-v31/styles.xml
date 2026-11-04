@@ -1,0 +1,10 @@
+<resources>
+    <!-- Explicit platform attributes also cover OEM launchers that bypass AndroidX aliases. -->
+    <style name="AppTheme.NoActionBarLaunch" parent="AppTheme.LaunchBase">
+        <item name="android:windowSplashScreenBackground">@color/exptrack_launch_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/exptrack_icon</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">@bool/exptrack_light_system_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/exptrack_light_system_bars</item>
+    </style>
+</resources>
