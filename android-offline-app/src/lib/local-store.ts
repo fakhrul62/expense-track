@@ -1,5 +1,5 @@
 import { INCOME_SOURCES, isIncomeCategory } from "@/lib/income";
-import { encodeLoan, loanDetails, loanSummaries, LOAN_CATEGORY, REPAYMENT_CATEGORY } from "@/lib/loan-ledger";
+import { encodeLoan, loanDetails, loanSummaries, LOAN_CATEGORY, REPAYMENT_CATEGORY, LENT_CATEGORY, COLLECTION_CATEGORY, loanDirection, type LoanDirection } from "@/lib/loan-ledger";
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { openDB, type DBSchema } from "idb";
 import type { CategoryType, ExpenseItem } from "@/components/ExpenseModal";
@@ -22,6 +22,7 @@ interface NativeStore {
   list(options: { store: Store; month?: string }): Promise<{ records: RecordType[] }>;
   put(options: { store: Store; record: RecordType }): Promise<void>;
   putBatch(options: { accountId: string; records: Expense[] }): Promise<void>;
+  removeLoan(options: { accountId: string; id: string }): Promise<void>;
   remove(options: { store: Store; id: string }): Promise<void>;
   syncPending(options: { accountId: string }): Promise<{ mutations: SyncMutation[] }>;
   syncApply(options: { accountId: string; response: SyncResponse }): Promise<void>;
@@ -231,7 +232,7 @@ export async function saveExpenses(inputs: ExpenseInput[], ids: string[]) {
   const now = new Date().toISOString();
   const records = inputs.map((input, index) => {
     const cents = validateExpenseInput(input);
-    if (!input.categoryId || isIncomeCategory(input.categoryId) || input.categoryId === REPAYMENT_CATEGORY || input.note.startsWith("EXTRACK-LOAN:1:")) throw new Error("Choose a spending category for every expense.");
+    if (!input.categoryId || isIncomeCategory(input.categoryId) || input.categoryId === REPAYMENT_CATEGORY || input.categoryId === LENT_CATEGORY || input.note.startsWith("EXTRACK-LOAN:1:")) throw new Error("Choose a spending category for every expense.");
     return { ...input, amount: cents / 100, note: input.note.trim(), _id: ids[index], createdAt: now, updatedAt: now };
   });
   await initializeStore();
@@ -259,15 +260,27 @@ export async function saveExpenses(inputs: ExpenseInput[], ids: string[]) {
 }
 export async function saveExpense(input: { amount: number; categoryId: string; note: string; date: string }, id?: string) {
   if (id && loanDetails((await getTransactions(undefined, true)).find(e => e._id === id) ?? { _id: id, ...input })) throw new Error("Manage this entry on the Loans page.");
-  if (input.categoryId === REPAYMENT_CATEGORY || input.note.startsWith("EXTRACK-LOAN:1:")) throw new Error("Record loan repayments on the Loans page.");
+  if (input.categoryId === REPAYMENT_CATEGORY || input.categoryId === LENT_CATEGORY || input.note.startsWith("EXTRACK-LOAN:1:")) throw new Error("Record loan repayments on the Loans page.");
   await saveLedgerEntry(input, id);
 }
-export async function addLoan(input: { amount: number; lender: string; note: string; date: string; received: boolean }) {
+async function ensureLoanCategory(id: string, name: string) {
+  const categories = await allCategories();
+  const existing = categories.find(c => c._id === id || c.name.toLowerCase() === name.toLowerCase());
+  if (existing) return existing._id;
+  const now = new Date().toISOString();
+  await put("categories", { _id: id, name, icon: "🏦", isDefault: false, createdAt: now, updatedAt: now });
+  return id;
+}
+export async function addLoan(input: { amount: number; lender: string; note: string; date: string; received: boolean; direction?: LoanDirection }) {
   const lender = input.lender.trim();
   if (!lender || lender.length > 80) throw new Error("Enter a lender name within 80 characters.");
   if (input.note.length > 150) throw new Error("Keep the note within 150 characters.");
   if (input.date > localDate()) throw new Error("Choose today or an earlier borrowing date.");
-  await saveLedgerEntry({ amount: input.amount, categoryId: LOAN_CATEGORY, date: input.date, note: encodeLoan({ kind: "loan", lender, note: input.note.trim(), received: input.received }) });
+  const direction = input.direction ?? "borrowed";
+  if (direction !== "borrowed" && direction !== "lent") throw new Error("Choose I Owe or Owed to Me.");
+  validateExpenseInput({ ...input, categoryId: LOAN_CATEGORY });
+  const categoryId = direction === "lent" ? await ensureLoanCategory(LENT_CATEGORY, "Money lent") : LOAN_CATEGORY;
+  await saveLedgerEntry({ amount: input.amount, categoryId, date: input.date, note: encodeLoan({ kind: "loan", lender, note: input.note.trim(), received: input.received, direction }) });
 }
 export async function repayLoan(id: string, amount: number, date: string, note: string) {
   const save = async () => {
@@ -276,17 +289,34 @@ export async function repayLoan(id: string, amount: number, date: string, note: 
     if (!Number.isFinite(amount) || Math.round(amount * 100) < 1 || Math.round(amount * 100) > Math.round(loan.remaining * 100)) throw new Error("Repayment must be greater than zero and no more than the remaining balance.");
     if (date < loan.date || date > localDate()) throw new Error("Choose a repayment date between borrowing and today.");
     if (note.length > 150) throw new Error("Keep the note within 150 characters.");
-    const categories = await allCategories();
-    const repaymentCategory = categories.find(c => c._id === REPAYMENT_CATEGORY || c.name.toLowerCase() === "loan repayment");
-    if (!repaymentCategory) {
-      const now = new Date().toISOString();
-      // Existing categories with this name are resolved by the normal cloud alias mechanism.
-      await put("categories", { _id: REPAYMENT_CATEGORY, name: "Loan repayment", icon: "🏦", isDefault: false, createdAt: now, updatedAt: now });
-    }
-    await saveLedgerEntry({ amount, date, categoryId: repaymentCategory?._id ?? REPAYMENT_CATEGORY, note: encodeLoan({ kind: "payment", lender: loan.details.lender.slice(0,80), loanId: id, note: note.trim() }) });
+    const direction = loanDirection(loan.details);
+    const categoryId = direction === "lent" ? COLLECTION_CATEGORY : await ensureLoanCategory(REPAYMENT_CATEGORY, "Loan repayment");
+    await saveLedgerEntry({ amount, date, categoryId, note: encodeLoan({ kind: "payment", lender: loan.details.lender.slice(0,80), loanId: id, note: note.trim(), direction }) });
   };
   if (!isNative() && navigator.locks) await navigator.locks.request(`exptrack-loan-${activeAccount}-${id}`, save);
   else await save();
+}
+export async function deleteLoan(id: string) {
+  const accountId = activeAccount;
+  if (!accountId) throw new Error("Sign in before deleting a loan.");
+  if (isNative()) { await native.removeLoan({ accountId, id }); changed(); return; }
+  const database = await db();
+  if (accountId !== activeAccount) throw new Error("Account changed. Try again.");
+  const tx = database.transaction(["expenses", "outbox"], "readwrite");
+  try {
+    const records = await tx.objectStore("expenses").getAll();
+    const loan = records.find(record => record._id === id);
+    if (!loan || loanDetails(loan)?.kind !== "loan") throw new Error("This loan no longer exists. Refresh and try again.");
+    for (const record of records) {
+      const details = loanDetails(record);
+      if (record._id === id || (details?.kind === "payment" && details.loanId === id)) {
+        await tx.objectStore("expenses").delete(record._id);
+        await tx.objectStore("outbox").put(changeRecord("expenses", record._id));
+      }
+    }
+    await tx.done;
+  } catch (error) { tx.abort(); await tx.done.catch(() => undefined); throw error; }
+  changed();
 }
 export async function addCategory(name: string, icon: string) {
   const categories = await getCategories();
@@ -305,7 +335,7 @@ export const deleteExpense = async (id: string) => {
 };
 export const deleteCategory = (id: string) => { if (isIncomeCategory(id)) throw new Error("Income sources cannot be deleted."); return remove("categories", id); };
 
-export async function getCategories() { return (await allCategories()).filter(c => !isIncomeCategory(c._id) && c._id !== REPAYMENT_CATEGORY && c.name.toLowerCase() !== "loan repayment"); }
+export async function getCategories() { return (await allCategories()).filter(c => !isIncomeCategory(c._id) && c._id !== REPAYMENT_CATEGORY && c._id !== LENT_CATEGORY && !["loan repayment", "money lent"].includes(c.name.toLowerCase())); }
 export async function getIncomeCategories() { return (await allCategories()).filter(c => isIncomeCategory(c._id)).sort((a,b) => INCOME_SOURCES.findIndex(([id]) => id === a._id) - INCOME_SOURCES.findIndex(([id]) => id === b._id)).map(c => ({ ...c, name: c.name.replace(/^Income: /, '') })); }
 export async function getExpenses(month: string) { return (await getTransactions(month)).filter(e => !isIncomeCategory(e.categoryId)); }
 export async function getBalance() {

@@ -177,6 +177,38 @@ public class ExpenseStorePlugin extends Plugin {
         });
     }
 
+    @PluginMethod public void removeLoan(PluginCall call) {
+        worker.execute(() -> {
+            try {
+                if (accountId == null || !accountId.equals(call.getString("accountId"))) throw new IllegalArgumentException("Account changed. Try again.");
+                String id = call.getString("id");
+                if (id == null) throw new IllegalArgumentException("Missing loan");
+                SQLiteDatabase db = helper.getWritableDatabase();
+                db.beginTransaction();
+                try {
+                    java.util.List<String> ids = new java.util.ArrayList<>();
+                    boolean found = false;
+                    try (Cursor cursor = db.query("expenses", new String[]{"id", "category_id", "note"}, null, null, null, null, null)) {
+                        while (cursor.moveToNext()) {
+                            String entryId = cursor.getString(0), category = cursor.getString(1), note = cursor.getString(2);
+                            JSONObject details = null;
+                            if (note.startsWith("EXTRACK-LOAN:1:")) try { details = new JSONObject(note.substring("EXTRACK-LOAN:1:".length())); } catch (Exception ignored) { }
+                            if (id.equals(entryId)) {
+                                if (!"10000000-0000-4000-8000-000000000002".equals(category) && (details == null || !"loan".equals(details.optString("kind")))) throw new IllegalArgumentException("This entry is not a loan.");
+                                found = true; ids.add(entryId);
+                            } else if (details != null && "payment".equals(details.optString("kind")) && id.equals(details.optString("loanId"))) ids.add(entryId);
+                        }
+                    }
+                    if (!found) throw new IllegalArgumentException("This loan no longer exists. Refresh and try again.");
+                    for (String entryId : ids) { db.delete("expenses", "id = ?", new String[]{entryId}); CloudSyncStorage.enqueue(db, "expenses", entryId, null); }
+                    db.setTransactionSuccessful();
+                } finally { db.endTransaction(); }
+                call.resolve();
+            } catch (IllegalArgumentException error) { call.reject(error.getMessage(), error); }
+              catch (Exception error) { call.reject("Could not delete the loan. Your records have not been changed.", error); }
+        });
+    }
+
     @PluginMethod public void remove(PluginCall call) {
         worker.execute(() -> {
             try {

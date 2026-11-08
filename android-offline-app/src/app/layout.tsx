@@ -2,6 +2,11 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource/space-mono/400.css";
 import "@fontsource/space-mono/700.css";
 import "@fontsource/inter/latin.css";
+import "@fontsource/arimo/latin-400.css";
+import "@fontsource/arimo/latin-700.css";
+import "@fontsource/carlito/latin-400.css";
+import "@fontsource/carlito/latin-700.css";
+import { FontPreference } from "@/components/FontSettings";
 import NativeLifecycle from "@/components/NativeLifecycle";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
@@ -31,7 +36,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans selection:bg-[#EA580C] selection:text-white transition-colors duration-250">
         <ThemeProvider>
-          <AuthProvider><SyncProvider><NativeLifecycle />{children}</SyncProvider></AuthProvider>
+          <FontPreference /><AuthProvider><SyncProvider><NativeLifecycle />{children}</SyncProvider></AuthProvider>
         </ThemeProvider>
       </body>
     </html>

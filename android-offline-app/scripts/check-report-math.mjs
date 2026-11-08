@@ -1,0 +1,10 @@
+import ts from 'typescript';import vm from 'node:vm';import {readFileSync} from 'node:fs';import assert from 'node:assert/strict';
+const cache=new Map();function load(path){if(cache.has(path))return cache.get(path);const exports={};cache.set(path,exports);const source=ts.transpileModule(readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInNewContext(source,{exports,require:name=>load(name.replace('@/','src/')+'.ts')});return exports;}
+const{makeReport}=load('src/lib/reports.ts'),{encodeLoan,LOAN_CATEGORY,LENT_CATEGORY,COLLECTION_CATEGORY}=load('src/lib/loan-ledger.ts');
+const entry=(id,amount,category,date,note='')=>({_id:id,amount,categoryId:{_id:category,name:'Example',icon:'',isDefault:false},date,note});
+const bank='10000000-0000-4000-8000-000000000006';
+const entries=[entry('bank',100,bank,'2026-10-01'),entry('in',.10,bank,'2026-11-01'),entry('in2',.20,bank,'2026-11-01'),entry('out',.15,'default-bus','2026-11-02'),entry('future',999,bank,'2026-11-25'),entry('olddebt',900,LOAN_CATEGORY,'2026-11-02',encodeLoan({kind:'loan',lender:'Old',note:'',received:false})),entry('oldlent',600,LENT_CATEGORY,'2026-11-02',encodeLoan({kind:'loan',direction:'lent',lender:'Old friend',note:'',received:false}))];
+const report=makeReport(entries,'2026-11','2026-11-08');assert.equal(report.income,.30);assert.equal(report.expense,.15);assert.equal(report.net,.15);assert.equal(report.opening,100);assert.equal(report.closing,100.15);assert.equal(report.futureCount,1);assert.equal(report.count,3);assert.equal(report.days.length,2);assert.equal(report.days[0].income,.30);
+const empty=makeReport(entries,'2026-09','2026-11-08');assert.equal(empty.count,0);assert.equal(empty.opening,0);assert.equal(empty.closing,0);
+assert.throws(()=>makeReport(entries,'2026-13','2026-11-08'));assert.throws(()=>makeReport(entries,'bad','2026-11-08'));
+console.log('PASS: report integer-cent arithmetic, prior-month opening balance, future exclusion/count, existing debt exclusion in both directions, daily grouping, empty months and invalid month validation.');

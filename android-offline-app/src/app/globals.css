@@ -291,6 +291,13 @@ html.dark .bottom-nav-bg .bottom-nav-add { background: #FF9A57; color: #24170E; 
 .expense-dialog input[type="date"] { min-height: 52px; }
 .expense-category[aria-pressed="true"] { background: #EA580C; color: white; }
 .batch-expense-row { min-height: 44px; }
+html[data-app-font="inter"] { --font-app: "Inter", sans-serif; }
+html[data-app-font="arial"] { --font-app: Arial, "Arimo", sans-serif; }
+html[data-app-font="calibri"] { --font-app: Calibri, "Carlito", sans-serif; }
+html[data-app-font="system"] { --font-app: system-ui, sans-serif; }
+html[data-app-font="retro"] { --font-app: "Space Mono", monospace; }
+html[data-app-font] { --font-space-mono: var(--font-app); --font-sans: var(--font-app); }
+html[data-app-font] body, html[data-app-font] .font-sans { font-family: var(--font-app); }
 @media (max-width: 639px) {
   .expense-overlay { padding-top: max(24px, calc(env(safe-area-inset-top, 0px) + 12px)); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
   [role="dialog"].expense-dialog {

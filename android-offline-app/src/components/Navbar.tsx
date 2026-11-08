@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { Plus, Sun, Moon, HandCoins } from "lucide-react";
+import { Plus, Sun, Moon, HandCoins, BarChart3 } from "lucide-react";
 
 interface NavbarProps {
   onOpenAddExpense?: () => void;
@@ -41,6 +41,7 @@ export default function Navbar({ onOpenAddExpense }: NavbarProps) {
           )}
 
           <div className="hidden md:block"><Link href="/loans" aria-label="Loans" className="retro-btn-secondary flex items-center gap-2 px-3 text-xs font-mono-retro"><HandCoins size={16} /> LOANS</Link></div>
+          <Link href="/reports" aria-label="Reports" title="Reports & chart" className="retro-btn-secondary px-2.5 py-1.5 min-h-[38px] min-w-[38px] flex items-center justify-center"><BarChart3 className="w-4 h-4" /></Link>
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}

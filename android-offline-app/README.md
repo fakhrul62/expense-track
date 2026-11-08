@@ -4,7 +4,7 @@ Expense tracker packaged with Capacitor. Android saves expenses and categories i
 
 ## Install
 
-Copy `dist/EXPTRACK-1.8.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records. Version 1.8.0 must be installed once to enable future updates through Config.
+Copy `dist/EXPTRACK-1.4.2.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
 
 Requires Android 7.0 (API 24) or newer and Android System WebView/Chrome 111 or newer. An outdated WebView shows an update instruction screen. Broad compatibility is targeted; performance on every Android device has not been verified.
 
@@ -12,23 +12,17 @@ Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.
 
 ## Features
 
-- Config > App Updates checks the public GitHub repository, downloads a verified newer APK and opens Android installer. The first update can require allowing EXPTRACK to install apps from this source. Android asks for installation approval. APK version, package, checksum and signer must match; app data stays in place. See UPDATES.md for release publishing and test details.
-
-- Loans page: total outstanding, original borrowing, partial/full repayments, cleared history, and automatic recognition of existing Loan received entries. Managed loan records keep their repayment history instead of being edited/deleted as ordinary cash entries.
 - Add money received: Salary, Loan received, Owed money repaid, Freelance and Other. Edit/delete income just like spending.
-- Available balance is all received money minus all expenses dated through today, across all months. Future entries are shown in their month but excluded from current balance. Newly received loans add cash. Existing debt can be recorded without changing cash; repayments reduce cash and outstanding debt. The outstanding debt itself is never subtracted from available cash.
+- Available balance is all received money minus all expenses dated through today, across all months. Future entries are shown in their month but excluded from current balance. Loans received add cash; debt repayment schedules are not tracked.
 - Income uses reserved stable category identities in the existing transactional SQLite/IndexedDB storage and cloud outbox. No destructive database migration is needed. Update all Android installations to 1.4.0: earlier versions cannot distinguish these income entries from spending.
 - Live interface preview: run npm run dev -- --port 3005 and open http://localhost:3005.
 
 - Create, edit, delete, and browse expenses by month.
-- Add up to 20 expenses in one popup: use + Add Another beside Close to stack another editable card below, then Save all. Remove individual drafts from their card. Each entry has its own category/date/note. Count and total stay visible while the stacked cards scroll. The phone form reserves top spacing for notches and keeps Add Another reachable with the number pad open.
-- Batch entries and their pending sync changes are saved together in one IndexedDB/SQLite transaction. If any entry fails, the batch is rolled back and drafts stay open for correction.
 - Sign in or sign up with Google, or use email and password. Native Google sign-in requires Google Play services.
 - Automatic account-specific app/site sync, including edits and deletions. Offline changes persist across restarts. Sync runs while the app is open, on reconnect/resume, and every 30 seconds while visible; Settings also provides Sync now. Closed-app background uploads are not scheduled. For simultaneous edits, the last change received by the server wins.
 - Show/hide the password on sign-in and registration.
 - Switch daily entries between list and grid; the selected view stays saved on this device.
-- Android spending reminders: choose 1-6 daily notifications and a local time for each in Config. Save reminder times to apply changes. The default is one reminder at 8:30 PM. Preferences stay with this account on this device. Switching reminders off or signing out cancels all slots. Allow notifications after signing in; Android battery restrictions can delay delivery. Background reminders are not available in the browser preview.
-- Aligned bottom navigation, compact month selector above balance, and sync status/Sync now only in Config. Mobile Config lives in the bottom navigation; the duplicate header icon is removed.
+- Android daily spending notification around 8:30 PM local time, scheduled offline. Allow notifications after signing in; turn the reminder off/on in Settings. Signing out cancels it. Android battery restrictions can delay delivery. Background reminders are not available in the browser preview.
 - Today's total follows the device's local date, independent of the selected month.
 - Amounts are stored as integer cents in SQLite.
 - Default and custom categories, with protection against deleting categories in use.

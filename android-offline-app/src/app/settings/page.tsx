@@ -14,6 +14,7 @@ import Link from "next/link";
 import DailyReminder from "@/components/DailyReminder";
 import SyncStatus from "@/components/SyncStatus";
 import AppUpdates from "@/components/AppUpdates";
+import FontSettings from "@/components/FontSettings";
 
 export default function SettingsPage() {
   const { user, logout, loading: authLoading } = useAuth();
@@ -163,6 +164,8 @@ export default function SettingsPage() {
 
         <section className="retro-box-lg p-5 space-y-3"><h2 className="font-mono-retro font-bold text-sm">CLOUD SYNC</h2><SyncStatus detailed /></section>
 
+        <FontSettings />
+        <Link href="/reports" className="retro-btn-secondary w-full px-4 font-mono-retro text-sm">VIEW REPORTS & CHART</Link>
         <AppUpdates />
         <DailyReminder />
 

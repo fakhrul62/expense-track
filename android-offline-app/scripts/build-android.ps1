@@ -1,4 +1,10 @@
 $ErrorActionPreference = 'Stop'
+function Get-ApkSha256([string]$FilePath) {
+    $stream = [IO.File]::OpenRead((Join-Path $PWD $FilePath))
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try { return [BitConverter]::ToString($algorithm.ComputeHash($stream)).Replace('-', '').ToLowerInvariant() }
+    finally { $stream.Dispose(); $algorithm.Dispose() }
+}
 Set-Location (Split-Path -Parent $PSScriptRoot)
 if (!$env:JAVA_HOME -or !(Test-Path "$env:JAVA_HOME\bin\java.exe")) {
     $localJdk = Get-ChildItem .tools -Directory -Filter 'jdk-21*' -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -10,7 +16,7 @@ if (!$env:ANDROID_HOME) { throw 'Set ANDROID_HOME to an Android SDK with platfor
 $sdkPath = $env:ANDROID_HOME.Replace('\', '/')
 [IO.File]::WriteAllText("$PWD\android\local.properties", "sdk.dir=$sdkPath`n")
 New-Item -ItemType Directory -Force .keys,dist,build/apk | Out-Null
-$apkName = 'EXPTRACK-1.8.0.apk'
+$apkName = 'EXPTRACK-1.10.0.apk'
 $stagedApk = "build/apk/$apkName"
 $finalApk = "dist/$apkName"
 if (!(Test-Path .keys/release.json)) {
@@ -46,8 +52,8 @@ try {
     & "$buildTools\zipalign.exe" -c -p 4 $stagedApk
     if ($LASTEXITCODE -ne 0) { throw 'Signed APK alignment verification failed.' }
     Copy-Item -LiteralPath $stagedApk -Destination $finalApk -Force
-    if ((Get-FileHash $stagedApk).Hash -ne (Get-FileHash $finalApk).Hash) { throw 'Delivered APK differs from verified APK.' }
-    $hash = Get-FileHash $finalApk -Algorithm SHA256
+    if ((Get-ApkSha256 $stagedApk) -ne (Get-ApkSha256 $finalApk)) { throw 'Delivered APK differs from verified APK.' }
+    $hash = [pscustomobject]@{ Algorithm = 'SHA256'; Hash = Get-ApkSha256 $finalApk; Path = (Join-Path $PWD $finalApk) }
     "$($hash.Hash.ToLower())  $apkName" | Set-Content "dist/$apkName.sha256" -Encoding ascii
     $releaseVersion = (Get-Content package.json | ConvertFrom-Json).version
     $releaseCode = [int]([regex]::Match((Get-Content android/app/build.gradle -Raw), 'versionCode\s+(\d+)').Groups[1].Value)

@@ -1,7 +1,9 @@
-EXPTRACK 1.8.0
+EXPTRACK 1.10.0
 
-Install EXPTRACK-1.8.0.apk over your existing app; do not uninstall.
+Install EXPTRACK-1.10.0.apk over your existing app; do not uninstall.
 
-This build adds Config > App Updates. Install it once; later app versions can be checked, downloaded and opened in Android installer from Config. Android asks for installation approval and may require Allow from this source for EXPTRACK on the first update. Existing records, login and settings remain in place.
+Adds Bank Balance to Add Money. Use for opening funds not already counted. Config includes readable Inter, Arial-style, Calibri-style, system and Retro fonts. Reports are on the header chart button or Config, with monthly totals, daily chart and category breakdown.
 
-Publish the generated android-update.json with each new versioned APK and checksum.
+Owed to Me supports installment payments. Mistaken loans can be deleted with confirmation; deleting a loan removes its linked cash/payment history and recalculates the available balance.
+
+Existing records, login and reminders are preserved. Update app/site together for the new Bank Balance income source.
