@@ -4,6 +4,8 @@ import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { X, Plus, Trash2 } from "lucide-react";
 import { saveExpense, saveExpenses, localDate, errorMessage } from "@/lib/local-store";
+import PaymentSourcePicker from "@/components/PaymentSourcePicker";
+import { moneyDetails, paymentSource, BANK_CATEGORY, type PaymentSource } from "@/lib/wallet";
 import { useModal } from "@/lib/use-modal";
 
 export interface CategoryType { _id: string; name: string; icon: string; isDefault: boolean }
@@ -16,7 +18,7 @@ interface ExpenseModalProps {
   categories: CategoryType[];
   editingExpense?: ExpenseItem | null;
 }
-type Draft = { key: string; amount: string; categoryId: string; note: string; date: string };
+type Draft = { key: string; amount: string; categoryId: string; note: string; date: string; source: PaymentSource };
 const MAX_EXPENSES = 20;
 const validDraft = (row: Draft) => {
   const amount = Number(row.amount), cents = Math.round(amount * 100);
@@ -32,7 +34,7 @@ export default function ExpenseModal(props: ExpenseModalProps) {
 }
 
 function ExpenseForm({ income = false, isOpen, onClose, onSuccess, categories, editingExpense }: ExpenseModalProps) {
-  const [rows, setRows] = useState<Draft[]>(() => [{ key: crypto.randomUUID(), amount: editingExpense?.amount.toString() ?? "", categoryId: editingExpense ? (typeof editingExpense.categoryId === "object" ? editingExpense.categoryId._id : editingExpense.categoryId) : categories[0]?._id ?? "", note: editingExpense?.note ?? "", date: editingExpense?.date ?? localDate() }]);
+  const [rows, setRows] = useState<Draft[]>(() => [{ key: crypto.randomUUID(), amount: editingExpense?.amount.toString() ?? "", categoryId: editingExpense ? (typeof editingExpense.categoryId === "object" ? editingExpense.categoryId._id : editingExpense.categoryId) : categories[0]?._id ?? "", note: moneyDetails(editingExpense?.note)?.note ?? editingExpense?.note ?? "", source: editingExpense ? paymentSource(editingExpense) : income && categories[0]?._id === BANK_CATEGORY ? "bank" : "cash", date: editingExpense?.date ?? localDate() }]);
   const [activeKey, setActiveKey] = useState(rows[0].key);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,7 +56,7 @@ function ExpenseForm({ income = false, isOpen, onClose, onSuccess, categories, e
     const invalid = rows.map(validDraft).find(Boolean);
     if (invalid) { setError(invalid); return; }
     const previous = rows[rows.length - 1];
-    const next = { key: crypto.randomUUID(), amount: "", categoryId: previous.categoryId, date: previous.date, note: "" };
+    const next = { key: crypto.randomUUID(), amount: "", categoryId: previous.categoryId, date: previous.date, note: "", source: previous.source };
     setRows(previous => [...previous, next]); setActiveKey(next.key); setError("");
   }
   function remove(key: string) {
@@ -72,7 +74,7 @@ function ExpenseForm({ income = false, isOpen, onClose, onSuccess, categories, e
     }
     submitting.current = true; setLoading(true); setError("");
     try {
-      const inputs = rows.map(row => ({ amount: Number(row.amount), categoryId: row.categoryId, note: row.note, date: row.date }));
+      const inputs = rows.map(row => ({ amount: Number(row.amount), categoryId: row.categoryId, note: row.note, date: row.date, source: row.source }));
       if (canBatch) await saveExpenses(inputs, rows.map(row => row.key));
       else await saveExpense(inputs[0], editingExpense?._id);
       onSuccess(); onClose();
@@ -94,6 +96,7 @@ function ExpenseForm({ income = false, isOpen, onClose, onSuccess, categories, e
           {error && <p role="alert" className="border border-red-700 bg-red-100 dark:bg-red-950 p-3 text-xs text-red-800 dark:text-red-200">{error}</p>}
           {rows.map((row, index) => <fieldset key={row.key} data-expense-key={row.key} aria-label={`Expense ${index + 1}`} disabled={loading} className={`space-y-4 min-w-0 ${batch ? "expense-stack-card border border-current/25 p-3" : ""}`}>
             {batch && <div className="flex items-center justify-between gap-2"><h3 className="font-mono-retro font-bold text-xs">EXPENSE {index + 1}</h3><button type="button" aria-label={`Remove expense ${index + 1}`} onClick={() => remove(row.key)} className="retro-btn-secondary p-2"><Trash2 size={14} /></button></div>}
+            <PaymentSourcePicker value={row.source} income={income} onChange={source => update(row.key, {source})} />
             <div className="grid grid-cols-2 gap-3">
               <label className="block min-w-0 font-mono-retro text-xs font-bold">AMOUNT (৳)<input type="number" inputMode="decimal" aria-label="Amount" required min="0.01" max="999999999.99" step="0.01" placeholder="0.00" value={row.amount} onChange={e => update(row.key, {amount:e.target.value})} autoFocus={row.key === activeKey} className="retro-input w-full min-w-0 mt-2 font-mono-retro text-lg font-bold" /></label>
               <label className="block min-w-0 font-mono-retro text-xs font-bold">DATE<input type="date" aria-label="Date" required value={row.date} onChange={e => update(row.key, {date:e.target.value})} className="retro-input w-full min-w-0 mt-2 text-xs" /></label>
@@ -101,7 +104,7 @@ function ExpenseForm({ income = false, isOpen, onClose, onSuccess, categories, e
             <div>
               <p className="font-mono-retro text-xs font-bold mb-2">CATEGORY</p>
               <div role="group" aria-label="Choose category" className="grid grid-cols-4 gap-2 max-h-32 overflow-y-auto p-1 border border-current/20">
-                {categories.map(cat => <button type="button" key={cat._id} title={cat.name} aria-pressed={cat._id === row.categoryId} onClick={() => update(row.key, {categoryId:cat._id})} className={`expense-category flex flex-col items-center justify-center gap-1 p-2 min-h-[52px] min-w-0 border-2 transition-colors ${cat._id === row.categoryId ? "bg-[#EA580C] text-white border-[#1C1917] dark:border-[#AC7146]" : "bg-[#FFFDF9] dark:bg-[#202428] border-current/20"}`}><span aria-hidden="true" className="text-lg">{cat.icon}</span><span className="font-mono-retro text-[9px] sm:text-[10px] truncate max-w-full">{cat.name}</span></button>)}
+                {categories.map(cat => <button type="button" key={cat._id} title={cat.name} aria-pressed={cat._id === row.categoryId} onClick={() => update(row.key, {categoryId:cat._id, ...(income && cat._id === BANK_CATEGORY ? {source:"bank" as const} : {})})} className={`expense-category flex flex-col items-center justify-center gap-1 p-2 min-h-[52px] min-w-0 border-2 transition-colors ${cat._id === row.categoryId ? "bg-[#EA580C] text-white border-[#1C1917] dark:border-[#AC7146]" : "bg-[#FFFDF9] dark:bg-[#202428] border-current/20"}`}><span aria-hidden="true" className="text-lg">{cat.icon}</span><span className="font-mono-retro text-[9px] sm:text-[10px] truncate max-w-full">{cat.name}</span></button>)}
               </div>
             </div>
             <label className="block font-mono-retro text-xs font-bold">NOTE <span className="font-normal opacity-60">(OPTIONAL)</span><input type="text" aria-label="Note" maxLength={500} placeholder="What was it for?" value={row.note} onChange={e => update(row.key, {note:e.target.value})} className="retro-input w-full mt-2 text-sm font-normal" /></label>
@@ -109,6 +112,7 @@ function ExpenseForm({ income = false, isOpen, onClose, onSuccess, categories, e
         </div>
         <div className="expense-form-footer shrink-0 border-t-2 border-current/20 px-5 pt-3 pb-5 space-y-3">
           {batch && <div className="flex justify-between gap-2 font-mono-retro text-xs"><span>{rows.length} EXPENSES · TOTAL</span><strong className="break-all tabular-nums" data-testid="batch-total">৳ {total.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>}
+          {batch && <p className="text-[11px] opacity-70 tabular-nums">Cash: ৳ {rows.filter(r=>r.source==='cash').reduce((n,r)=>n+Math.round((Number(r.amount)||0)*100),0)/100} · Bank/Card: ৳ {rows.filter(r=>r.source==='bank').reduce((n,r)=>n+Math.round((Number(r.amount)||0)*100),0)/100}</p>}
           <div className="flex gap-3"><button type="button" onClick={onClose} disabled={loading} className="retro-btn-secondary flex-1 font-mono-retro text-xs">CANCEL</button><button type="submit" disabled={loading} className="retro-btn flex-1 font-mono-retro text-xs">{loading ? "SAVING..." : editingExpense ? "UPDATE" : batch ? `SAVE ALL (${rows.length})` : "SAVE"}</button></div>
         </div>
       </form>

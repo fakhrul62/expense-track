@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" source("../");
 
 @variant dark (&:where(.dark, .dark *));
 
@@ -309,3 +309,55 @@ html[data-app-font] body, html[data-app-font] .font-sans { font-family: var(--fo
     box-shadow: none !important;
   }
 }
+
+/* Coordinated appearance presets; the classic Retro palette stays available. */
+html[data-look="studio"] { --look-bg:#f3f5f9; --look-card:#ffffff; --look-text:#202b3c; --look-line:#d7dfeb; --look-accent:#315cba; --look-on:#ffffff; --look-soft:#e5edff; --look-radius:14px; }
+html[data-look="paper"] { --look-bg:#f6f0e5; --look-card:#fffcf5; --look-text:#3e332b; --look-line:#dfd3c1; --look-accent:#86563c; --look-on:#ffffff; --look-soft:#eee0ce; --look-radius:6px; }
+html[data-look="garden"] { --look-bg:#edf3ed; --look-card:#fafdf9; --look-text:#233d32; --look-line:#ccdcd0; --look-accent:#27624e; --look-on:#ffffff; --look-soft:#d9e9df; --look-radius:18px; }
+html[data-look="ink"] { --look-bg:#eef2f9; --look-card:#fff; --look-text:#26344a; --look-line:#d4deee; --look-accent:#355b9a; --look-on:#fff; --look-soft:#e2eafa; --look-radius:12px; }
+html[data-look]:not([data-look="retro"]).dark { --look-bg:#161e29; --look-card:#202c3b; --look-text:#e9eff9; --look-line:#3c4d63; --look-accent:#b4cbff; --look-on:#182743; --look-soft:#30415d; }
+html[data-look="garden"].dark { --look-bg:#14251f; --look-card:#20382d; --look-text:#e6f2e9; --look-line:#436753; --look-accent:#a2d6b6; --look-on:#142d21; --look-soft:#34533f; }
+html[data-look="paper"].dark { --look-bg:#241f1a; --look-card:#302922; --look-text:#f3eadd; --look-line:#665543; --look-accent:#e5ba90; --look-on:#342111; --look-soft:#51402f; }
+html[data-look]:not([data-look="retro"]) body,
+html[data-look]:not([data-look="retro"]) main,
+html[data-look]:not([data-look="retro"]) header,
+html[data-look]:not([data-look="retro"]) .bottom-nav-bg { background:var(--look-bg) !important; color:var(--look-text) !important; border-color:var(--look-line) !important; }
+html[data-look]:not([data-look="retro"]) .retro-box,
+html[data-look]:not([data-look="retro"]) .retro-box-lg,
+html[data-look]:not([data-look="retro"]) .stat-card,
+html[data-look]:not([data-look="retro"]) [role="dialog"] { background:var(--look-card) !important; color:var(--look-text) !important; border:1px solid var(--look-line) !important; border-radius:var(--look-radius); box-shadow:0 2px 5px #00000006 !important; }
+html[data-look]:not([data-look="retro"]) .retro-btn,
+html[data-look]:not([data-look="retro"]) .bottom-nav-add { background:var(--look-accent) !important; color:var(--look-on) !important; border:1px solid var(--look-accent) !important; border-radius:8px; box-shadow:none !important; }
+html[data-look]:not([data-look="retro"]) .retro-btn-secondary,
+html[data-look]:not([data-look="retro"]) .bottom-nav-item,
+html[data-look]:not([data-look="retro"]) .retro-input { background:var(--look-card) !important; color:var(--look-text) !important; border:1px solid var(--look-line) !important; border-radius:8px; box-shadow:none !important; }
+html[data-look]:not([data-look="retro"]) .retro-btn-danger { border-radius:8px; box-shadow:none !important; }
+html[data-look]:not([data-look="retro"]) [aria-pressed="true"]:not(.appearance-option),
+html[data-look]:not([data-look="retro"]) .bottom-nav-item[aria-current="page"] { background:var(--look-soft) !important; color:var(--look-text) !important; border-color:var(--look-accent) !important; }
+html[data-look]:not([data-look="retro"]) .bottom-nav-item.bottom-nav-add { background:var(--look-accent) !important; color:var(--look-on) !important; }
+html[data-look]:not([data-look="retro"]) .brand-mark { background:transparent !important; color:var(--look-text) !important; border:0 !important; padding:0; box-shadow:none !important; letter-spacing:-.7px; }
+html[data-look]:not([data-look="retro"]) .stat-card [class*="absolute"] { background:var(--look-soft) !important; color:var(--look-text) !important; border-color:var(--look-line) !important; }
+html[data-look]:not([data-look="retro"]) .stat-card h3,
+html[data-look]:not([data-look="retro"]) .stat-card p { color:var(--look-text) !important; }
+html[data-look]:not([data-look="retro"]) .expense-stack-card { border-radius:10px; border-color:var(--look-line); }
+html[data-look]:not([data-look="retro"]) [class*="bg-[#FEF08A]"] { background:var(--look-soft) !important; color:var(--look-text) !important; }
+html[data-look]:not([data-look="retro"]) [class*="text-[#1C1917]"] { color:var(--look-text); }
+html[data-look]:not([data-look="retro"]) .expense-row { border-color:var(--look-line) !important; }
+html[data-look]:not([data-look="retro"]) .retro-input:focus { outline:2px solid var(--look-accent); outline-offset:1px; }
+html.dark .appearance-option[aria-pressed="true"] { box-shadow:0 0 0 2px var(--look-accent,#ff9a57); }
+.appearance-option { min-height:110px; transition:transform 150ms ease; }
+.appearance-option:active { transform:scale(.98); }
+.eyebrow { font-size:10px; font-weight:700; letter-spacing:.12em; opacity:.65; }
+.report-income-card { border-top:3px solid #0d9488 !important; }
+.report-expense-card { border-top:3px solid #ea580c !important; }
+@media print {
+  header,.bottom-nav-bg,.report-controls { display:none !important; }
+  body,main { background:white !important;color:black !important; }
+  .report-page { max-width:none; padding:0; }
+  .retro-box,.retro-box-lg { break-inside:avoid;box-shadow:none !important; }
+}
+
+html[data-look] .appearance-option, html[data-look].dark .appearance-option[aria-pressed="true"] { background:var(--preview-bg) !important; color:var(--preview-text) !important; border-color:var(--preview-line) !important; }
+
+html[data-look]:not([data-look="retro"]) .stat-card > span,
+html[data-look]:not([data-look="retro"]) .stat-card > div { color:var(--look-text) !important; }

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { paymentSource } from "@/lib/wallet";
 import { loanDetails, transactionNote } from "@/lib/loan-ledger";
 import { isIncomeCategory, incomeLabel } from "@/lib/income";
 
@@ -27,7 +28,7 @@ export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const [incomeMode, setIncomeMode] = useState(false);
   const [incomeCategories, setIncomeCategories] = useState<CategoryType[]>([]);
-  const [balance, setBalance] = useState({ received: 0, spent: 0, available: 0 });
+  const [balance, setBalance] = useState({ cash: 0, bank: 0, available: 0 });
   const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -106,8 +107,8 @@ export default function DashboardPage() {
   }, [fetchExpenses, todayStr]);
 
   const monthlyTotal = useMemo(() => {
-    return expenses.reduce((sum, e) => sum + (isIncomeCategory(e.categoryId) ? 0 : Math.round(e.amount * 100)), 0) / 100;
-  }, [expenses]);
+    return expenses.reduce((sum, e) => sum + (e.date > todayStr || isIncomeCategory(e.categoryId) ? 0 : Math.round(e.amount * 100)), 0) / 100;
+  }, [expenses, todayStr]);
 
   // Group expenses by date (most recent first)
   const groupedExpenses = useMemo(() => {
@@ -122,7 +123,7 @@ export default function DashboardPage() {
     const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
     const visibleIds = new Set(expenses.slice(0, visibleCount).map(item => item._id));
     return sortedDates.map((date) => {
-      const dayTotal = groups[date].reduce((sum, item) => sum + (isIncomeCategory(item.categoryId) ? -1 : 1) * Math.round(item.amount * 100), 0) / 100;
+      const dayTotal = groups[date].reduce((sum, item) => sum + (isIncomeCategory(item.categoryId) ? 0 : Math.round(item.amount * 100)), 0) / 100;
       const items = groups[date].filter(item => visibleIds.has(item._id));
       return {
         date,
@@ -229,10 +230,9 @@ export default function DashboardPage() {
             <ChevronRight className="w-5 h-5" />
           </button>
         </section>
-        <section className="retro-box-lg p-4 space-y-3" aria-label="Your balance">
-          <div className="flex items-center justify-between gap-3"><div className="min-w-0"><p className="text-xs font-mono-retro">AVAILABLE BALANCE</p><p data-testid="available-balance" className="font-mono-retro font-black text-xl sm:text-2xl tabular-nums break-all">৳ {balance.available.toLocaleString('en-US', {minimumFractionDigits:2})}</p></div>
-          <button className="retro-btn px-3 text-xs shrink-0" onClick={() => { setIncomeMode(true); setEditingExpense(null); setIsExpenseModalOpen(true); }}>+ ADD MONEY</button></div>
-          <div className="grid grid-cols-2 gap-2 text-xs font-mono-retro tabular-nums"><p><span className="block text-[10px] opacity-70">Received</span><span className="break-all">৳ {balance.received.toLocaleString('en-US',{minimumFractionDigits:2})}</span></p><p><span className="block text-[10px] opacity-70">Spent</span><span className="break-all">৳ {balance.spent.toLocaleString('en-US',{minimumFractionDigits:2})}</span></p></div>
+        <section aria-label="Your balances" className="space-y-3">
+          <div className="flex items-center justify-between gap-3"><h2 className="text-xs font-bold uppercase tracking-wider opacity-70">YOUR MONEY</h2><button className="retro-btn px-3 text-xs" onClick={() => { setIncomeMode(true); setEditingExpense(null); setIsExpenseModalOpen(true); }}>+ ADD MONEY</button></div>
+          <div className="grid grid-cols-2 gap-3">{([['Bank / Card Balance', balance.bank, 'bank-balance'], ['Cash Balance', balance.cash, 'cash-balance']] as const).map(([label,amount,id]) => <div key={id} className="retro-box p-3 sm:p-4 min-w-0 wallet-card"><p className="text-[11px] font-bold opacity-70 uppercase">{label}</p><p data-testid={id} className="font-mono-retro font-bold text-xl sm:text-2xl tabular-nums break-all mt-2">৳ {amount.toLocaleString('en-US', {minimumFractionDigits:2})}</p></div>)}</div>
         </section>
         {error && <div role="alert" className="retro-box p-3 text-sm text-red-700">{error}<button className="retro-btn-secondary ml-2 px-3" onClick={fetchExpenses}>Retry</button></div>}
         {/* Totals Section */}
@@ -329,7 +329,7 @@ export default function DashboardPage() {
                     {formatDateHeader(group.date)}
                   </span>
                   <span className="opacity-80">
-                    Net spent: ৳{group.dayTotal.toFixed(2)}
+                    Spent: ৳{group.dayTotal.toFixed(2)}
                   </span>
                 </div>
 
@@ -365,6 +365,7 @@ export default function DashboardPage() {
                                 {incoming && <span className="text-green-700 dark:text-green-300 mr-1">INCOME</span>}
                                 {catName}
                               </h4>
+                              <p className="text-[10px] opacity-60 mt-1">{paymentSource(item) === "bank" ? "Bank / Card" : "Cash"}</p>
                               {transactionNote(item) && (
                                 <p className="font-sans text-xs opacity-75 truncate mt-0.5">
                                   {transactionNote(item)}

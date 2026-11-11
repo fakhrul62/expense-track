@@ -1,9 +1,13 @@
-EXPTRACK 1.10.0
+EXPTRACK 1.11.0
 
-Install EXPTRACK-1.10.0.apk over your existing app; do not uninstall.
+Install EXPTRACK-1.11.0.apk over your existing app. Do not uninstall; the signing key and package are unchanged.
 
-Adds Bank Balance to Add Money. Use for opening funds not already counted. Config includes readable Inter, Arial-style, Calibri-style, system and Retro fonts. Reports are on the header chart button or Config, with monthly totals, daily chart and category breakdown.
+Bank / Card Balance and Cash Balance are separate. Existing Bank Balance entries map to bank; older untagged entries map to cash. Change an entry's payment source in Edit if needed. New expenses default to cash. Add Money lets you choose where funds go; Loan received is now managed only on Loans.
 
-Owed to Me supports installment payments. Mistaken loans can be deleted with confirmation; deleting a loan removes its linked cash/payment history and recalculates the available balance.
+Loans has Active, Cleared and All. Borrowing and payments can use bank or cash. Existing lending history remains collectible; new borrowing uses one simple form. Existing debt only leaves both balances unchanged.
 
-Existing records, login and reminders are preserved. Update app/site together for the new Bank Balance income source.
+Reports offers Daily, Weekly (Monday to Sunday), Monthly and Custom dates, charts, category breakdowns, CSV export to a chosen Android folder and Print / PDF. Future entries and tracking-only debt are excluded.
+
+Config > Appearance includes Studio, Paper, Garden, Ink and Retro with matching fonts, colors and card styles. Font override and light/dark controls remain available.
+
+After publication, Config > App Updates can download this version. Source metadata is retained in existing synced note envelopes for compatibility; older app versions show combined balances until updated.

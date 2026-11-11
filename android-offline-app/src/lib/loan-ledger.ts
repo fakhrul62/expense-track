@@ -1,3 +1,4 @@
+import { moneyDetails, type PaymentSource } from "@/lib/wallet";
 import { isIncomeCategory } from "@/lib/income";
 import type { ExpenseItem } from "@/components/ExpenseModal";
 
@@ -9,7 +10,7 @@ export const REPAYMENT_CATEGORY = "20000000-0000-4000-8000-000000000001";
 export const LENT_CATEGORY = "20000000-0000-4000-8000-000000000002";
 export const COLLECTION_CATEGORY = "10000000-0000-4000-8000-000000000003";
 export type LoanDirection = "borrowed" | "lent";
-type Details = { kind: "loan" | "payment"; lender: string; note: string; loanId?: string; received?: boolean; direction?: LoanDirection };
+type Details = { kind: "loan" | "payment"; lender: string; note: string; loanId?: string; received?: boolean; direction?: LoanDirection; source?: PaymentSource };
 export const loanDirection = (details: Details): LoanDirection => details.direction === "lent" ? "lent" : "borrowed";
 export function loanDetails(item: ExpenseItem): Details | null {
   const category = typeof item.categoryId === "string" ? item.categoryId : item.categoryId._id;
@@ -30,7 +31,7 @@ export const encodeLoan = (details: Details) => PREFIX + JSON.stringify(details)
 export function transactionNote(item: ExpenseItem) {
   const details = loanDetails(item);
   const lent = details && loanDirection(details) === "lent";
-  return details ? `${details.kind === "payment" ? lent ? "Paid back by " : "Repaid to " : lent ? "Lent to " : "Borrowed from "}${details.lender}${details.note ? ` · ${details.note}` : ""}` : item.note;
+  return details ? `${details.kind === "payment" ? lent ? "Paid back by " : "Repaid to " : lent ? "Lent to " : "Borrowed from "}${details.lender}${details.note ? ` · ${details.note}` : ""}` : moneyDetails(item.note)?.note ?? item.note;
 }
 export function loanSummaries(entries: ExpenseItem[], today: string) {
   return entries.filter(e => loanDetails(e)?.kind === "loan").map(entry => {

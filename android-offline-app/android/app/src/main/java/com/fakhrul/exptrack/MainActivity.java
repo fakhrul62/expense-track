@@ -11,6 +11,8 @@ import java.io.InputStream;
 public class MainActivity extends BridgeActivity {
     @Override public void onCreate(Bundle savedInstanceState) {
         registerPlugin(ExpenseStorePlugin.class);
+        registerPlugin(ReportExportPlugin.class);
+        registerPlugin(AppAppearancePlugin.class);
         registerPlugin(AppUpdaterPlugin.class);
         registerPlugin(GoogleAuthPlugin.class);
         super.onCreate(savedInstanceState);
