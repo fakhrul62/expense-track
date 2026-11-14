@@ -9,3 +9,4 @@ export const INCOME_SOURCES = [
 ] as const;
 export const isIncomeCategory = (category: string | { _id: string }) => INCOME_SOURCES.some(([id]) => id === (typeof category === 'string' ? category : category._id));
 export const incomeLabel = (name: string) => name.replace(/^Income: /, '');
+export const reservedIncomeName = (name: string) => /^income\s*:/i.test(name.trim());

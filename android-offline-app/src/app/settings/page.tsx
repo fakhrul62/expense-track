@@ -16,9 +16,21 @@ import SyncStatus from "@/components/SyncStatus";
 import AppUpdates from "@/components/AppUpdates";
 import FontSettings from "@/components/FontSettings";
 
+const SETTINGS_TABS = [["updates", "Updates"], ["appearance", "Appearance"], ["reminders", "Reminders"], ["account", "Account"], ["categories", "Categories"]] as const;
+type SettingsTab = typeof SETTINGS_TABS[number][0];
+
 export default function SettingsPage() {
   const { user, logout, loading: authLoading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [tab, setTab] = useState<SettingsTab>("updates");
+  function tabKey(event: React.KeyboardEvent<HTMLButtonElement>, index: number) {
+    const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+    if (!keys.includes(event.key)) return;
+    event.preventDefault();
+    const next = event.key === "Home" ? 0 : event.key === "End" ? SETTINGS_TABS.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + SETTINGS_TABS.length) % SETTINGS_TABS.length;
+    setTab(SETTINGS_TABS[next][0]);
+    document.getElementById(`settings-tab-${SETTINGS_TABS[next][0]}`)?.focus();
+  }
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState<boolean>(false);
@@ -113,6 +125,11 @@ export default function SettingsPage() {
           </div>
         )}
 
+        <div role="tablist" aria-label="Settings sections" className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">{SETTINGS_TABS.map(([id,label],index) => <button key={id} id={`settings-tab-${id}`} type="button" role="tab" aria-selected={tab === id} aria-controls={`settings-panel-${id}`} tabIndex={tab === id ? 0 : -1} onKeyDown={event => tabKey(event,index)} onClick={() => setTab(id)} className={`${tab === id ? "retro-btn" : "retro-btn-secondary"} shrink-0 px-3 text-xs min-h-[42px]`}>{label}</button>)}</div>
+        <section id="settings-panel-updates" role="tabpanel" aria-labelledby="settings-tab-updates" hidden={tab !== "updates"} tabIndex={0} className="space-y-5 focus:outline-none">
+          <AppUpdates />
+        </section>
+        <section id="settings-panel-appearance" role="tabpanel" aria-labelledby="settings-tab-appearance" hidden={tab !== "appearance"} tabIndex={0} className="space-y-5 focus:outline-none">
         {/* Theme Settings Section */}
         <section className="retro-box-lg p-5 space-y-4">
           <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3">
@@ -153,6 +170,12 @@ export default function SettingsPage() {
           </div>
         </section>
 
+          <FontSettings />
+        </section>
+        <section id="settings-panel-reminders" role="tabpanel" aria-labelledby="settings-tab-reminders" hidden={tab !== "reminders"} tabIndex={0} className="space-y-5 focus:outline-none">
+          <DailyReminder />
+        </section>
+        <section id="settings-panel-account" role="tabpanel" aria-labelledby="settings-tab-account" hidden={tab !== "account"} tabIndex={0} className="space-y-5 focus:outline-none">
         <section className="retro-box-lg p-5 space-y-3">
           <h2 className="font-mono-retro font-bold text-sm">YOUR ACCOUNT</h2>
           <p className="text-sm break-all">{user?.name}<br />{user?.email}</p>
@@ -164,11 +187,9 @@ export default function SettingsPage() {
 
         <section className="retro-box-lg p-5 space-y-3"><h2 className="font-mono-retro font-bold text-sm">CLOUD SYNC</h2><SyncStatus detailed /></section>
 
-        <FontSettings />
-        <Link href="/reports" className="retro-btn-secondary w-full px-4 font-mono-retro text-sm">VIEW REPORTS & CHART</Link>
-        <AppUpdates />
-        <DailyReminder />
-
+          <Link href="/reports" className="retro-btn-secondary w-full px-4 font-mono-retro text-sm">VIEW REPORTS &amp; CHART</Link>
+        </section>
+        <section id="settings-panel-categories" role="tabpanel" aria-labelledby="settings-tab-categories" hidden={tab !== "categories"} tabIndex={0} className="space-y-5 focus:outline-none">
         {/* Category Management */}
         <section className="retro-box-lg p-5 space-y-4">
           <div className="flex items-center justify-between border-b-2 border-[#1C1917] dark:border-[#3F3F46] pb-3">
@@ -234,6 +255,7 @@ export default function SettingsPage() {
               ))}
             </div>
           )}
+        </section>
         </section>
       </main>
 

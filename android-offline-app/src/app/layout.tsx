@@ -12,6 +12,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { SyncProvider } from "@/context/SyncContext";
+import { UpdateProvider } from "@/context/UpdateContext";
 
 export const metadata: Metadata = {
   title: "EXPTRACK | Daily Expense Tracker",
@@ -36,7 +37,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans selection:bg-[#EA580C] selection:text-white transition-colors duration-250">
         <ThemeProvider>
-          <FontPreference /><AuthProvider><SyncProvider><NativeLifecycle />{children}</SyncProvider></AuthProvider>
+          <FontPreference /><AuthProvider><UpdateProvider><SyncProvider><NativeLifecycle />{children}</SyncProvider></UpdateProvider></AuthProvider>
         </ThemeProvider>
       </body>
     </html>

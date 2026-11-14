@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Plus, Settings, HandCoins } from "lucide-react";
+import UpdateBadge from "@/components/UpdateBadge";
 
 interface BottomNavProps {
   onOpenAddExpense: () => void;
@@ -23,7 +24,7 @@ export default function BottomNav({ onOpenAddExpense }: BottomNavProps) {
           <Plus aria-hidden="true" /><span>ADD</span>
         </button>
         <Link href="/settings" aria-current={pathname === "/settings" ? "page" : undefined} className="bottom-nav-item">
-          <Settings aria-hidden="true" /><span>CONFIG</span>
+          <span className="relative inline-flex"><Settings aria-hidden="true" /><UpdateBadge /></span><span>CONFIG</span>
         </Link>
       </div>
     </nav>

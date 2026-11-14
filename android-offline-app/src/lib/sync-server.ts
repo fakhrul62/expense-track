@@ -1,4 +1,6 @@
-import { INCOME_SOURCES, isIncomeCategory } from "@/lib/income";
+import { INCOME_SOURCES, isIncomeCategory, reservedIncomeName } from "@/lib/income";
+import { loanDetails, loanDirection, transactionNote, COLLECTION_CATEGORY } from "@/lib/loan-ledger";
+import { encodeMoney, paymentSource } from "@/lib/wallet";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { accountCors, accountReply, authenticatedAccount } from "@/lib/account-server";
@@ -19,7 +21,7 @@ function mutation(value: unknown): SyncMutation {
   if (item.store === "categories") {
     if (typeof record.name !== "string" || !record.name.trim() || record.name.trim().length > 40 || typeof record.icon !== "string" || record.icon.length > 16 || typeof record.isDefault !== "boolean" || record.isDefault !== item.id.startsWith("default-")) throw new Error("Invalid category");
     const income = INCOME_SOURCES.find(([id]) => id === item.id);
-    if ((income && record.name !== 'Income: ' + income[1]) || (!income && record.name.startsWith('Income: '))) throw new Error('Reserved income source');
+    if ((income && record.name !== 'Income: ' + income[1]) || (!income && reservedIncomeName(record.name))) throw new Error('Reserved income source');
     const defaults: Record<string, string> = { "default-bus": "Bus", "default-rickshaw": "Rickshaw", "default-metro": "Metro", "default-food": "Food" };
     if (record.isDefault && record.name !== defaults[item.id]) throw new Error("Invalid default category");
     result.record = { ...common, name: record.name.trim(), icon: record.icon, isDefault: record.isDefault };
@@ -73,6 +75,12 @@ export async function syncHandler(req: NextRequest) {
           for (let count = 0; count < 10; count++) {
             const alias = await aliases.findOne({ userId, aliasId: id }, options);
             if (!alias) return id;
+            // A legacy/bad alias must never change the sign of a cash movement.
+            if (isIncomeCategory(id) !== isIncomeCategory(alias.canonicalId)) {
+              await aliases.deleteOne({ _id: alias._id }, options);
+              warnings.add("An unsafe category mapping was removed. Your transaction direction was preserved.");
+              return id;
+            }
             id = alias.canonicalId;
           }
           throw new Error("Invalid category mapping");
@@ -85,6 +93,7 @@ export async function syncHandler(req: NextRequest) {
             const category = record as CloudCategory;
             const existing = await records.findOne({ userId, store: "categories", deleted: false, categoryName: category.name.toLowerCase() }, options);
             if (existing && existing.recordId !== id) {
+              if (isIncomeCategory(id) !== isIncomeCategory(existing.recordId)) throw new Error("Category direction conflict");
               await aliases.updateOne({ userId, aliasId: id }, { $set: { canonicalId: existing.recordId } }, { ...options, upsert: true });
               id = existing.recordId;
             }
@@ -98,6 +107,7 @@ export async function syncHandler(req: NextRequest) {
             if (parent.deleted) {
               const replacement = await records.findOne({ userId, store: "categories", deleted: false, categoryName: parent.categoryName }, options);
               if (replacement) {
+                if (isIncomeCategory(categoryId) !== isIncomeCategory(replacement.recordId)) throw new Error("Category direction conflict");
                 await aliases.updateOne({ userId, aliasId: categoryId }, { $set: { canonicalId: replacement.recordId } }, { ...options, upsert: true });
                 categoryId = replacement.recordId;
               } else await records.updateOne({ _id: parent._id }, { $set: { deleted: false } }, options);
@@ -118,6 +128,41 @@ export async function syncHandler(req: NextRequest) {
           await applied.insertOne({ userId, mutationId: change.mutationId, createdAt: new Date() }, options);
         }
         const all = await records.find({ userId }, options).toArray();
+        const liveLoans = new Map(all.filter(item => item.store === "expenses" && !item.deleted && loanDetails(item.record)?.kind === "loan").map(item => [item.recordId, item.record as CloudExpense]));
+        // Reconcile after the whole batch, so principal/payment upload ordering is irrelevant.
+        // Keep actual money movements when their principal was deleted elsewhere. Converting
+        // them to ordinary entries makes them visible, editable and deletable from Home.
+        const recoveryId = "20000000-0000-4000-8000-000000000003";
+        for (const item of all.filter(item => item.store === "expenses" && !item.deleted)) {
+          const expense = item.record as CloudExpense;
+          const details = loanDetails(expense);
+          if (details?.kind !== "payment") continue;
+          const principal = liveLoans.get(details.loanId!);
+          if (principal && loanDirection(loanDetails(principal)!) === loanDirection(details)) continue;
+          if (!changes.length) await states.updateOne({ userId }, { $inc: { revision: 1 } }, options);
+          const incoming = isIncomeCategory(expense.categoryId);
+          let categoryId = COLLECTION_CATEGORY;
+          if (!incoming) {
+            const named = all.find(c => c.store === "categories" && !c.deleted && c.categoryName === "unlinked loan payment" && !isIncomeCategory(c.recordId));
+            categoryId = named?.recordId ?? (all.some(c => c.recordId === recoveryId && c.categoryName !== "unlinked loan payment") ? new mongoose.Types.ObjectId().toHexString() : recoveryId);
+          }
+          if (!all.some(c => c.store === "categories" && c.recordId === categoryId && !c.deleted)) {
+            const now = new Date().toISOString();
+            const previousCategory = all.find(c => c.store === "categories" && c.recordId === categoryId);
+            const category: CloudCategory = { _id: categoryId, name: incoming ? "Income: Owed money repaid" : "Unlinked loan payment", icon: "🤝", isDefault: false, createdAt: previousCategory?.record?.createdAt ?? now, updatedAt: now };
+            await records.updateOne({ userId, store: "categories", recordId: categoryId }, { $set: { record: category, categoryName: category.name.toLowerCase(), deleted: false } }, { ...options, upsert: true });
+            if (previousCategory) { previousCategory.record = category; previousCategory.deleted = false; }
+            else all.push({ _id: new mongoose.Types.ObjectId(), userId, store: "categories", recordId: categoryId, record: category, categoryName: category.name.toLowerCase(), deleted: false });
+          }
+          const note = transactionNote(expense) ?? "Loan payment";
+          // Older API records may have a longer envelope than current loan forms allow.
+          let shortened = note;
+          while (true) { try { encodeMoney(shortened, paymentSource(expense)); break; } catch { shortened = shortened.slice(0, -1); } }
+          const recovered: CloudExpense = { ...expense, categoryId, note: encodeMoney(shortened, paymentSource(expense)), updatedAt: new Date().toISOString() };
+          await records.updateOne({ _id: item._id }, { $set: { record: recovered, recoveryOriginal: item.recoveryOriginal ?? expense } }, options);
+          item.record = recovered;
+          warnings.add("A payment's loan no longer exists. Its money movement was kept as a standalone entry; review, edit or delete it from Home.");
+        }
         const categoryAliases = await aliases.find({ userId }, options).toArray();
         response = {
           acknowledged: changes.map(change => change.mutationId),

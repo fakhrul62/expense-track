@@ -59,6 +59,7 @@ export default function DeleteConfirmModal({
           <div className="flex gap-3">
             <button
               onClick={onClose}
+              data-modal-initial-focus
               disabled={loading}
               className="retro-btn-secondary flex-1 font-mono-retro text-xs"
             >

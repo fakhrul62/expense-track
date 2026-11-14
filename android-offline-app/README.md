@@ -4,17 +4,23 @@ Expense tracker packaged with Capacitor. Android saves expenses and categories i
 
 ## Install
 
-Copy `dist/EXPTRACK-1.11.0.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
+Copy `dist/EXPTRACK-1.11.3.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
 
 Requires Android 7.0 (API 24) or newer and Android System WebView/Chrome 111 or newer. An outdated WebView shows an update instruction screen. Broad compatibility is targeted; performance on every Android device has not been verified.
 
 Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.users. Opaque server sessions are hashed in auth_sessions. Synced expenses and categories restore after signing into the same account. Uninstalling or clearing app data loses changes that have not synced. Installing a newer APK signed with the same key preserves local records.
 
+## Version 1.11.3
+
+- Loans offer Borrowed and Lent, with Cash Balance or Bank Balance as the source/destination. Debt and receivables have separate totals; installment/full collections, repayments and confirmed deletion retain their wallet effects.
+- Config opens on Updates, followed by Appearance, Reminders, Account and Categories tabs. A subtle Config badge signals a confirmed newer Android release. Quiet checks run on startup/resume/reconnection with an hourly cooldown; downloading and installation remain explicit.
+- QC fixes protect income/expense category identity, recover orphaned loan payments into editable standalone entries, harden CSV export, improve modal focus and report contrast, and group loan payments efficiently. Patched dependencies and regression tests are included.
+
 ## Features
 
 - Add money: Salary, Bank Balance, Owed money repaid, Freelance and Other. Choose bank/card or cash as the destination. Record borrowing on Loans rather than Add Money.
 - Separate bank/card and cash balances carry across months. Expenses default to cash; each entry can choose its source. Future entries are shown in their month but excluded from current balances and actual spending totals. Loans support partial/full payments and confirmed deletion; existing debt can be tracked without changing money balances.
-- Income uses reserved stable category identities in the existing transactional SQLite/IndexedDB storage and cloud outbox. No destructive database migration is needed. Update all Android installations to 1.11.0 for consistent wallet display and decoded payment-source notes.
+- Income uses reserved stable category identities in the existing transactional SQLite/IndexedDB storage and cloud outbox. No destructive database migration is needed. Update all Android installations to 1.11.3 for consistent wallet display and decoded payment-source notes.
 - Live interface preview: run npm run dev -- --port 3005 and open http://localhost:3005.
 
 - Create, edit, delete, and browse expenses by month.
@@ -58,7 +64,7 @@ The browser preview uses IndexedDB; Android uses SQLite through `ExpenseStorePlu
 
 The account API is in src/app/api/auth/[action]/route.ts; cloud sync is in src/app/api/sync/route.ts. Configure MONGODB_URI and GOOGLE_CLIENT_ID on the server. Android credentials use Keystore-backed AES-GCM storage; browser authentication uses an HTTP-only cookie. Sessions last 30 days. The first signed-in account keeps the pre-login local expenses; other accounts receive separate local databases. Sign-out preserves records for returning accounts. Existing SQLite and IndexedDB databases migrate their records into the durable sync queue. The web and mobile builds are separate: mobile export stages source without server routes. Original server routes and login screens are preserved in `archive/` for reference and excluded from the Android export.
 
-Google configuration is documented in GOOGLE-SETUP.md. Current release evidence is in VALIDATION-1.11.0.md; Google sign-in limitations are documented in VALIDATION-1.3.0.md.
+Google configuration is documented in GOOGLE-SETUP.md. Current release evidence is in VALIDATION-1.11.3.md; Google sign-in limitations are documented in VALIDATION-1.3.0.md.
 
 
 ## Version 1.11.0

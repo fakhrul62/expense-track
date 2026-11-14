@@ -1,27 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Capacitor, registerPlugin, type PluginListenerHandle } from "@capacitor/core";
+import { Capacitor } from "@capacitor/core";
+import { appUpdater as updater } from "@/lib/app-updater";
+import { useUpdates } from "@/context/UpdateContext";
 import { Download, RefreshCw } from "lucide-react";
 import { errorMessage } from "@/lib/local-store";
 
-interface UpdateState { currentVersion: string; currentCode: number; latestVersion?: string; latestCode?: number; available: boolean; ready: boolean; canInstall: boolean }
-interface Updater {
-  getState(): Promise<UpdateState>;
-  check(): Promise<UpdateState>;
-  download(): Promise<UpdateState>;
-  install(): Promise<{ status: "permission" | "installer" }>;
-  cancelDownload(): Promise<void>;
-  addListener(name: "downloadProgress", listener: (event: {percent: number}) => void): Promise<PluginListenerHandle>;
-}
-const updater = registerPlugin<Updater>("AppUpdater");
-
 export default function AppUpdates() {
-  const [platform, setPlatform] = useState("loading");
-  const [info, setInfo] = useState<UpdateState | null>(null);
+  const { platform, info, publish: setInfo, checked, check: checkUpdate, lock } = useUpdates();
   const [busy, setBusy] = useState("");
   const [progress, setProgress] = useState(0);
-  const [checked, setChecked] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const running = useRef(false);
@@ -29,33 +18,30 @@ export default function AppUpdates() {
   useEffect(() => {
     mounted.current = true;
     const android = Capacitor.getPlatform() === "android";
-    void Promise.resolve().then(async () => {
-      if (!mounted.current) return;
-      setPlatform(android ? "android" : "web");
-      if (android) { const result = await updater.getState(); if (mounted.current) setInfo(result); }
-    }).catch(e => { if (mounted.current) setError(errorMessage(e)); });
     const listener = android ? updater.addListener("downloadProgress", event => { if (mounted.current) setProgress(event.percent); }) : null;
-    const resume = () => { if (android && !running.current) void updater.getState().then(value => { if (mounted.current) setInfo(value); }).catch(e => { if (mounted.current) setError(errorMessage(e)); }); };
-    window.addEventListener("exptrack:resume", resume);
-    return () => { mounted.current = false; window.removeEventListener("exptrack:resume", resume); void listener?.then(handle => handle.remove()); };
+    return () => { mounted.current = false; void listener?.then(handle => handle.remove()).catch(() => undefined); };
   }, []);
   async function check() {
     if (running.current) return;
     running.current = true; setBusy("checking"); setError(""); setMessage("");
-    try { const result = await updater.check(); if (mounted.current) { setInfo(result); setChecked(true); } }
+    try { const result = await checkUpdate(); if (mounted.current && result) setInfo(result); }
     catch (e) { if (mounted.current) setError(errorMessage(e)); }
     finally { running.current = false; if (mounted.current) setBusy(""); }
   }
   async function install() {
     if (running.current || !info?.available) return;
     running.current = true; setError(""); setMessage("");
-    try {
-      if (!info.ready) { setBusy("downloading"); setProgress(0); const downloaded = await updater.download(); if (mounted.current) setInfo(downloaded); }
+    try { await lock(async () => {
+      // A passive check may have completed while this action waited for the lock.
+      const latest = await updater.getState();
+      if (mounted.current) setInfo(latest);
+      if (!latest.available) { if (mounted.current) setMessage("You’re up to date."); return; }
+      if (!latest.ready) { setBusy("downloading"); setProgress(0); const downloaded = await updater.download(); if (mounted.current) setInfo(downloaded); }
       if (!mounted.current) return;
       setBusy("installing");
       const result = await updater.install();
       if (mounted.current) setMessage(result.status === "permission" ? "Allow updates from EXPTRACK in Android Settings, then return and tap Install update." : "Confirm the update in Android’s installer. If you cancel, you can install it here later.");
-    } catch (e) { if (mounted.current) setError(errorMessage(e)); }
+    }); } catch (e) { if (mounted.current) setError(errorMessage(e)); }
     finally { running.current = false; if (mounted.current) setBusy(""); }
   }
   return <section className="retro-box-lg p-5 space-y-3" aria-labelledby="app-updates-heading">

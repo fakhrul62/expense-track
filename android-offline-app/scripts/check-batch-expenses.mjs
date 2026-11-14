@@ -22,7 +22,7 @@ async function allRecords(){return page.evaluate(async native=>{
 try{
  if(native)await page.evaluate(async s=>{await window.Capacitor.Plugins.ExpenseStore.setUser({id:s.user.id});await window.Capacitor.Plugins.ExpenseStore.writeSession({value:JSON.stringify(s)});},session);
  else await page.addInitScript(s=>{if(location.origin!=='http://localhost:3005')return;localStorage.setItem('exptrack-account',JSON.stringify(s));},session);
- await page.goto(base+'/');await page.getByTestId('available-balance').waitFor();
+ await page.goto(base+'/');await page.getByTestId('cash-balance').waitFor();
  await open();
  await expect.poll(()=>page.getByRole('dialog').evaluate(e=>Math.round(e.getBoundingClientRect().top))).toBeGreaterThanOrEqual(24);
  const headerAction=await page.getByRole('button',{name:'+ Add Another',exact:true}).boundingBox(),closeAction=await page.getByRole('button',{name:'Close expense',exact:true}).boundingBox(),amountBox=await field('Amount').boundingBox();
@@ -42,10 +42,10 @@ try{
   for(const width of [320,390]){await page.setViewportSize({width,height:700});for(const dark of [false,true]){await page.evaluate(d=>{localStorage.setItem('theme',d?'dark':'light');window.dispatchEvent(new Event('exptrack:theme'));},dark);await page.screenshot({path:`test-results/batch-${width}-${dark?'dark':'light'}.png`,animations:'disabled'});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}}
  }
  await page.getByRole('button',{name:'SAVE ALL (3)',exact:true}).evaluate(button=>{button.click();button.click();});await expect(page.getByRole('dialog')).toHaveCount(0);
- await expect(page.getByTestId('available-balance')).toHaveText('৳ -220.00');assert.equal((await allRecords()).length,3);
- await page.reload();await expect(page.getByTestId('available-balance')).toHaveText('৳ -220.00');
- const lunch=page.locator('.expense-row').filter({hasText:'Lunch'});await lunch.getByRole('button',{name:'Edit Expense',exact:true}).click();activeRow=1;await expect(page.getByRole('button',{name:'+ Add Another',exact:true})).toHaveCount(0);await field('Amount').fill('150');await page.getByRole('button',{name:'UPDATE',exact:true}).click();await expect(page.getByTestId('available-balance')).toHaveText('৳ -250.00');
- await page.getByRole('button',{name:'+ ADD MONEY',exact:true}).click();await expect(page.getByRole('button',{name:'+ Add Another',exact:true})).toHaveCount(0);await field('Amount').fill('20000');await field('Note').fill('Test salary');await page.getByRole('button',{name:'SAVE',exact:true}).click();await expect(page.getByTestId('available-balance')).toHaveText('৳ 19,750.00');
+ await expect(page.getByTestId('cash-balance')).toHaveText('৳ -220.00');assert.equal((await allRecords()).length,3);
+ await page.reload();await expect(page.getByTestId('cash-balance')).toHaveText('৳ -220.00');
+ const lunch=page.locator('.expense-row').filter({hasText:'Lunch'});await lunch.getByRole('button',{name:'Edit Expense',exact:true}).click();activeRow=1;await expect(page.getByRole('button',{name:'+ Add Another',exact:true})).toHaveCount(0);await field('Amount').fill('150');await page.getByRole('button',{name:'UPDATE',exact:true}).click();await expect(page.getByTestId('cash-balance')).toHaveText('৳ -250.00');
+ await page.getByRole('button',{name:'+ ADD MONEY',exact:true}).click();await expect(page.getByRole('button',{name:'+ Add Another',exact:true})).toHaveCount(0);await field('Amount').fill('20000');await field('Note').fill('Test salary');await page.getByRole('button',{name:'SAVE',exact:true}).click();await expect(page.getByTestId('cash-balance')).toHaveText('৳ 19,750.00');
  await open();await fill('10','Cancelled batch');await addAnother();await page.getByRole('button',{name:'CANCEL',exact:true}).click();assert.equal((await allRecords()).length,4);
  if(native){
   const rollback=await page.evaluate(async accountId=>{
@@ -61,7 +61,7 @@ try{
   const category=await page.evaluate(()=>new Promise(resolve=>{const r=indexedDB.open('exptrack-local');r.onsuccess=()=>{const db=r.result,tx=db.transaction('categories','readwrite'),store=tx.objectStore('categories'),read=store.get('default-food');let saved;read.onsuccess=()=>{saved=read.result;store.delete('default-food');};tx.oncomplete=()=>{db.close();resolve(saved);};};}));
   await page.getByRole('button',{name:'SAVE ALL (2)',exact:true}).click();await expect(page.getByRole('dialog').getByRole('alert')).toContainText('category no longer exists');assert.equal((await allRecords()).length,4);
   await page.evaluate(category=>new Promise(resolve=>{const r=indexedDB.open('exptrack-local');r.onsuccess=()=>{const db=r.result,tx=db.transaction('categories','readwrite');tx.objectStore('categories').put(category);tx.oncomplete=()=>{db.close();resolve();};};}),category);
-  await page.getByRole('button',{name:'SAVE ALL (2)',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0);assert.equal((await allRecords()).length,6);await expect(page.getByTestId('available-balance')).toHaveText('৳ 19,739.00');
+  await page.getByRole('button',{name:'SAVE ALL (2)',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0);assert.equal((await allRecords()).length,6);await expect(page.getByTestId('cash-balance')).toHaveText('৳ 19,739.00');
  }
  assert.deepEqual(errors,[]);
  console.log(`PASS (${native?'native SQLite':'browser IndexedDB'}): compact multi-entry editing/removal, per-entry categories/dates/notes, accurate totals, no duplicate double-submit, reload, ordinary edit/income preserved, cancel, and atomic rollback.`);

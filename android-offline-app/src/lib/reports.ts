@@ -52,10 +52,15 @@ export function makeReport(entries: ExpenseItem[], range: string | ReportRange, 
 }
 
 // Quote every cell and neutralize spreadsheet formulas in user-supplied text.
-const cell = (value: unknown) => '"' + String(value).replace(/^[=+@-]/, "'$&").replace(/"/g, '""') + '"';
+const cell = (value: unknown) => {
+  if (typeof value === "number" && Number.isFinite(value)) return value.toFixed(2);
+  const text = String(value);
+  const safe = /^[\s\u0000-\u001f\u007f]*[=+@-]/u.test(text) ? "'" + text : text;
+  return '"' + safe.replace(/"/g, '""') + '"';
+};
 export function reportCSV(report: ReturnType<typeof makeReport>) {
-  const rows: unknown[][] = [["EXPTRACK report",report.start,report.end],["Income",report.income.toFixed(2)],["Expenses",report.expense.toFixed(2)],["Net",report.net.toFixed(2)],[],["Date","Type","Category","Source","Amount (BDT)","Note"]];
-  for (const e of [...report.entries].sort((a,b)=>a.date.localeCompare(b.date))) rows.push([e.date,isIncomeCategory(e.categoryId)?"Income":"Expense",typeof e.categoryId === "string" ? "Uncategorized" : incomeLabel(e.categoryId.name),paymentSource(e),e.amount.toFixed(2),transactionNote(e) ?? ""]);
+  const rows: unknown[][] = [["EXPTRACK report",report.start,report.end],["Income",report.income],["Expenses",report.expense],["Net",report.net],[],["Date","Type","Category","Source","Amount (BDT)","Note"]];
+  for (const e of [...report.entries].sort((a,b)=>a.date.localeCompare(b.date))) rows.push([e.date,isIncomeCategory(e.categoryId)?"Income":"Expense",typeof e.categoryId === "string" ? "Uncategorized" : incomeLabel(e.categoryId.name),paymentSource(e),e.amount,transactionNote(e) ?? ""]);
   return "\uFEFF"+rows.map(row=>row.map(cell).join(",")).join("\r\n");
 }
 export function reportHTML(report: ReturnType<typeof makeReport>) {

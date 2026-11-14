@@ -17,6 +17,8 @@ export function encodeMoney(note: string, source: PaymentSource) {
   if (encoded.length > 500) throw new Error("Please shorten the note so it fits with its payment source.");
   return encoded;
 }
+// JSON escaping and source metadata count toward the shared 500-character limit.
+export const moneyNoteCapacity = (note: string, source: PaymentSource) => 500 - (PREFIX + JSON.stringify({ note: note.trim(), source })).length;
 export function paymentSource(entry: Pick<ExpenseItem, "note" | "categoryId">): PaymentSource {
   const money = moneyDetails(entry.note);
   if (money) return money.source;

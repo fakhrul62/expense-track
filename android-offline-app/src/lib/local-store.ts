@@ -1,5 +1,5 @@
 import { encodeMoney, paymentSource, walletBalances, type PaymentSource, BANK_CATEGORY } from "@/lib/wallet";
-import { INCOME_SOURCES, isIncomeCategory } from "@/lib/income";
+import { INCOME_SOURCES, isIncomeCategory, reservedIncomeName } from "@/lib/income";
 import { encodeLoan, loanDetails, loanSummaries, LOAN_CATEGORY, REPAYMENT_CATEGORY, LENT_CATEGORY, COLLECTION_CATEGORY, loanDirection, type LoanDirection } from "@/lib/loan-ledger";
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { openDB, type DBSchema } from "idb";
@@ -324,7 +324,7 @@ export async function deleteLoan(id: string) {
 export async function addCategory(name: string, icon: string) {
   const categories = await getCategories();
   name = name.trim();
-  if (name.startsWith("Income: ")) throw new Error("This name is reserved for income sources.");
+  if (reservedIncomeName(name)) throw new Error("This name is reserved for income sources.");
   if (!name || name.length > 40) throw new Error("Use a category name between 1 and 40 characters.");
   if (categories.some(c => c.name.toLowerCase() === name.toLowerCase())) throw new Error("A category with this name already exists.");
   if (icon.length > 16) throw new Error("Choose a single emoji for the category.");

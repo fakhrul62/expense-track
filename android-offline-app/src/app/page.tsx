@@ -385,6 +385,7 @@ export default function DashboardPage() {
                               {loanDetails(item) ? <Link href="/loans" className="retro-btn-secondary px-2 text-[10px] font-mono-retro">LOAN</Link> : <>
                               <button
                                 onClick={() => handleOpenEditExpense(item)}
+                                data-focus-key={`edit-expense-${item._id}`}
                                 className="retro-btn-secondary w-8 h-8 p-0 flex items-center justify-center min-h-[32px] min-w-[32px]"
                                 title="Edit Expense"
                                 aria-label={incoming ? "Edit Income" : "Edit Expense"}
@@ -393,6 +394,7 @@ export default function DashboardPage() {
                               </button>
                               <button
                                 onClick={() => setDeletingExpenseId(item._id)}
+                                data-focus-key={`delete-expense-${item._id}`}
                                 className="retro-btn-danger w-8 h-8 p-0 flex items-center justify-center min-h-[32px] min-w-[32px]"
                                 title="Delete Expense"
                                 aria-label={incoming ? "Delete Income" : "Delete Expense"}

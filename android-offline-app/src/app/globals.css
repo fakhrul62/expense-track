@@ -258,6 +258,9 @@ html.dark .expense-row:hover { background: #282F35 !important; }
 }
 .bottom-nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
 .bottom-nav-item span { font-size: 10px; line-height: 12px; }
+.update-badge { position:absolute; top:-5px; right:-9px; display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border-radius:50%; border:1px solid var(--look-card,#fffdf9); background:var(--look-accent,#b94308); color:var(--look-on,#fff); pointer-events:none; }
+.update-badge svg, .bottom-nav-item .update-badge svg { width:9px; height:9px; stroke-width:3; }
+html.dark[data-look="retro"] .update-badge { background:#ff9a57; color:#24170e; border-color:#202428; }
 .bottom-nav-bg .bottom-nav-item[aria-current="page"] { background: #1C1917; color: #FFFDF9; }
 .bottom-nav-bg .bottom-nav-add { background: #EA580C; color: white; }
 .bottom-nav-bg .bottom-nav-item:active { transform: translateY(1px); }
@@ -347,7 +350,12 @@ html[data-look]:not([data-look="retro"]) .retro-input:focus { outline:2px solid 
 html.dark .appearance-option[aria-pressed="true"] { box-shadow:0 0 0 2px var(--look-accent,#ff9a57); }
 .appearance-option { min-height:110px; transition:transform 150ms ease; }
 .appearance-option:active { transform:scale(.98); }
-.eyebrow { font-size:10px; font-weight:700; letter-spacing:.12em; opacity:.65; }
+.eyebrow { font-size:10px; font-weight:700; letter-spacing:.12em; opacity:.8; }
+/* White-on-orange small labels need a darker orange; keep the classic palette. */
+html:not(.dark) .retro-btn,
+html:not(.dark) .bottom-nav-bg .bottom-nav-add,
+html:not(.dark) .expense-category[aria-pressed="true"] { background-color:#b94308; color:#fff; }
+html:not(.dark) .retro-btn:hover { background-color:#9a3607; }
 .report-income-card { border-top:3px solid #0d9488 !important; }
 .report-expense-card { border-top:3px solid #ea580c !important; }
 @media print {

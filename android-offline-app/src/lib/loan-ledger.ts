@@ -34,9 +34,19 @@ export function transactionNote(item: ExpenseItem) {
   return details ? `${details.kind === "payment" ? lent ? "Paid back by " : "Repaid to " : lent ? "Lent to " : "Borrowed from "}${details.lender}${details.note ? ` · ${details.note}` : ""}` : moneyDetails(item.note)?.note ?? item.note;
 }
 export function loanSummaries(entries: ExpenseItem[], today: string) {
-  return entries.filter(e => loanDetails(e)?.kind === "loan").map(entry => {
-    const details = loanDetails(entry)!;
-    const payments = entries.filter(e => { const d = loanDetails(e); return d?.kind === "payment" && d.loanId === entry._id && loanDirection(d) === loanDirection(details); }).sort((a,b) => b.date.localeCompare(a.date));
+  const principals: { entry: ExpenseItem; details: Details }[] = [];
+  const groups = new Map<string, ExpenseItem[]>();
+  for (const entry of entries) {
+    const details = loanDetails(entry);
+    if (details?.kind === "loan") principals.push({ entry, details });
+    else if (details?.kind === "payment") {
+      const key = `${loanDirection(details)}:${details.loanId}`;
+      const payments = groups.get(key) ?? [];
+      payments.push(entry); groups.set(key, payments);
+    }
+  }
+  return principals.map(({ entry, details }) => {
+    const payments = (groups.get(`${loanDirection(details)}:${entry._id}`) ?? []).sort((a,b) => b.date.localeCompare(a.date));
     const paidCents = payments.filter(p => p.date <= today).reduce((sum,p) => sum + Math.round(p.amount * 100), 0);
     const principalCents = Math.round(entry.amount * 100);
     return { ...entry, details, payments, paid: paidCents / 100,

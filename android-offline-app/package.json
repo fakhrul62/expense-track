@@ -1,6 +1,6 @@
 {
   "name": "expense-track",
-  "version": "1.11.0",
+  "version": "1.11.3",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,7 +12,9 @@
     "typecheck": "tsc --noEmit",
     "android:sync": "npm run build && cap sync android",
     "android:build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-android.ps1",
-    "check:accounts": "node --env-file=server/.env scripts/check-accounts.mjs"
+    "check:accounts": "node --env-file=server/.env scripts/check-accounts.mjs",
+    "test": "node scripts/check-wallet-math.mjs && node scripts/check-report-math.mjs && node scripts/check-qc-regressions.mjs && node scripts/check-google-verifier.mjs && node scripts/check-update-policy.mjs",
+    "test:sync": "node --env-file=.env.local scripts/check-qc-sync.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",
@@ -30,7 +32,7 @@
     "idb": "^8.0.3",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.30.0",
-    "mongoose": "^9.9.1",
+    "mongoose": "^9.12.1",
     "next": "16.4.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -49,5 +51,10 @@
     "eslint-config-next": "16.4.3",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "glob": "^14.0.6",
+    "minimatch@>=7": "^11.0.8",
+    "uuid": "^11.1.1"
   }
 }

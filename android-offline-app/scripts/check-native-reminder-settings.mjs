@@ -15,7 +15,7 @@ async function count(value){await expect.poll(async()=>(await pending()).length)
 async function save(){await page.getByRole('button',{name:'SAVE REMINDER TIMES',exact:true}).click();await expect(page.getByRole('button',{name:'SAVE REMINDER TIMES',exact:true})).toBeDisabled();}
 try {
  await page.evaluate(async s=>{await window.Capacitor.Plugins.ExpenseStore.setUser({id:s.user.id});await window.Capacitor.Plugins.ExpenseStore.writeSession({value:JSON.stringify(s)});},session);
- await page.goto('https://localhost/settings/');
+ await page.goto('https://localhost/settings/');await page.getByRole('tab',{name:'Reminders',exact:true}).click();
  const reminders=page.getByRole('region',{name:'SPENDING REMINDERS'});
  await reminders.getByRole('switch',{name:'REMINDER ON',exact:true}).waitFor();
  await count(1);await expect(page.getByLabel('Reminder 1',{exact:true})).toHaveValue('20:30');
@@ -30,17 +30,17 @@ try {
  await page.getByLabel('Reminders per day').selectOption('1');
  await page.getByLabel('Reminder 1',{exact:true}).fill('10:10');
  await save();await count(1);
- await page.reload();
+ await page.reload();await page.getByRole('tab',{name:'Reminders',exact:true}).click();
  await expect(page.getByLabel('Reminder 1',{exact:true})).toHaveValue('10:10');
  await expect(page.getByLabel('Reminders per day')).toHaveValue('1');await count(1);
  await page.getByLabel('Reminders per day').selectOption('6');await save();await count(6);
  await reminders.getByRole('switch').click();await reminders.getByRole('switch',{name:'ENABLE REMINDER',exact:true}).waitFor();await count(0);
- await page.reload();await reminders.getByRole('switch',{name:'ENABLE REMINDER',exact:true}).waitFor();await count(0);
+ await page.reload();await page.getByRole('tab',{name:'Reminders',exact:true}).click();await reminders.getByRole('switch',{name:'ENABLE REMINDER',exact:true}).waitFor();await count(0);
  await reminders.getByRole('switch').click();await reminders.getByRole('switch',{name:'REMINDER ON',exact:true}).waitFor();await count(6);
  await reminders.scrollIntoViewIfNeeded();
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- await page.goto('https://localhost/settings/');
- await page.getByRole('button',{name:'SIGN OUT',exact:true}).click();
+ await page.goto('https://localhost/settings/');await page.getByRole('tab',{name:'Reminders',exact:true}).click();
+ await page.getByRole('tab',{name:'Account',exact:true}).click();await page.getByRole('button',{name:'SIGN OUT',exact:true}).click();
  await page.getByRole('button',{name:'SIGN IN',exact:true}).waitFor();await count(0);
  assert.deepEqual(errors,[]);
  console.log('PASS: native 1/3/6 daily alarms, chosen times, duplicate rejection, stale alarm removal, reload persistence, off/on, logout cancellation, compact phone layout and no top Config icon.');

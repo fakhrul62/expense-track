@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import UpdateBadge from "@/components/UpdateBadge";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { Plus, Sun, Moon, HandCoins, BarChart3 } from "lucide-react";
@@ -56,7 +57,7 @@ export default function Navbar({ onOpenAddExpense }: NavbarProps) {
             )}
           </button>
 
-          <div className="hidden md:block"><Link href="/settings" className="retro-btn-secondary flex items-center px-3 text-xs font-mono-retro" title="Settings">CONFIG</Link></div>
+          <div className="hidden md:block"><Link href="/settings" className="retro-btn-secondary flex items-center px-3 text-xs font-mono-retro" title="Settings"><span className="relative">CONFIG<UpdateBadge /></span></Link></div>
 
 
         </div>

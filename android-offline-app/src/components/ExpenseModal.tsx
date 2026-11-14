@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { X, Plus, Trash2 } from "lucide-react";
 import { saveExpense, saveExpenses, localDate, errorMessage } from "@/lib/local-store";
 import PaymentSourcePicker from "@/components/PaymentSourcePicker";
-import { moneyDetails, paymentSource, BANK_CATEGORY, type PaymentSource } from "@/lib/wallet";
+import { moneyDetails, moneyNoteCapacity, paymentSource, BANK_CATEGORY, type PaymentSource } from "@/lib/wallet";
 import { useModal } from "@/lib/use-modal";
 
 export interface CategoryType { _id: string; name: string; icon: string; isDefault: boolean }
@@ -25,7 +25,7 @@ const validDraft = (row: Draft) => {
   if (!row.amount || !Number.isFinite(amount) || cents < 1 || cents > 99999999999 || Math.abs(amount * 100 - cents) > .0001) return "Enter an amount with up to two decimal places.";
   if (!row.categoryId) return "Choose a category.";
   if (!/^\d{4}-\d{2}-\d{2}$/.test(row.date) || localDate(new Date(`${row.date}T12:00:00`)) !== row.date) return "Choose a valid date.";
-  if (row.note.length > 500) return "Keep the note within 500 characters.";
+  if (moneyNoteCapacity(row.note, row.source) < 0) return "Shorten the note to fit its storage limit (quotes use extra space).";
   return "";
 };
 
@@ -107,13 +107,13 @@ function ExpenseForm({ income = false, isOpen, onClose, onSuccess, categories, e
                 {categories.map(cat => <button type="button" key={cat._id} title={cat.name} aria-pressed={cat._id === row.categoryId} onClick={() => update(row.key, {categoryId:cat._id, ...(income && cat._id === BANK_CATEGORY ? {source:"bank" as const} : {})})} className={`expense-category flex flex-col items-center justify-center gap-1 p-2 min-h-[52px] min-w-0 border-2 transition-colors ${cat._id === row.categoryId ? "bg-[#EA580C] text-white border-[#1C1917] dark:border-[#AC7146]" : "bg-[#FFFDF9] dark:bg-[#202428] border-current/20"}`}><span aria-hidden="true" className="text-lg">{cat.icon}</span><span className="font-mono-retro text-[9px] sm:text-[10px] truncate max-w-full">{cat.name}</span></button>)}
               </div>
             </div>
-            <label className="block font-mono-retro text-xs font-bold">NOTE <span className="font-normal opacity-60">(OPTIONAL)</span><input type="text" aria-label="Note" maxLength={500} placeholder="What was it for?" value={row.note} onChange={e => update(row.key, {note:e.target.value})} className="retro-input w-full mt-2 text-sm font-normal" /></label>
+            <label className="block font-mono-retro text-xs font-bold">NOTE <span className="font-normal opacity-80">(OPTIONAL)</span><input type="text" aria-label="Note" aria-describedby={`note-limit-${row.key}`} aria-invalid={moneyNoteCapacity(row.note, row.source) < 0} maxLength={500} placeholder="What was it for?" value={row.note} onChange={e => update(row.key, {note:e.target.value})} className="retro-input w-full mt-2 text-sm font-normal" /><span id={`note-limit-${row.key}`} className="block text-[10px] font-normal mt-1 opacity-80" role={moneyNoteCapacity(row.note, row.source) < 0 ? "alert" : undefined}>{moneyNoteCapacity(row.note, row.source) < 0 ? `Shorten by ${-moneyNoteCapacity(row.note, row.source)} storage characters` : `${moneyNoteCapacity(row.note, row.source)} storage characters left`} · quotes use extra space</span></label>
           </fieldset>)}
         </div>
         <div className="expense-form-footer shrink-0 border-t-2 border-current/20 px-5 pt-3 pb-5 space-y-3">
           {batch && <div className="flex justify-between gap-2 font-mono-retro text-xs"><span>{rows.length} EXPENSES · TOTAL</span><strong className="break-all tabular-nums" data-testid="batch-total">৳ {total.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>}
           {batch && <p className="text-[11px] opacity-70 tabular-nums">Cash: ৳ {rows.filter(r=>r.source==='cash').reduce((n,r)=>n+Math.round((Number(r.amount)||0)*100),0)/100} · Bank/Card: ৳ {rows.filter(r=>r.source==='bank').reduce((n,r)=>n+Math.round((Number(r.amount)||0)*100),0)/100}</p>}
-          <div className="flex gap-3"><button type="button" onClick={onClose} disabled={loading} className="retro-btn-secondary flex-1 font-mono-retro text-xs">CANCEL</button><button type="submit" disabled={loading} className="retro-btn flex-1 font-mono-retro text-xs">{loading ? "SAVING..." : editingExpense ? "UPDATE" : batch ? `SAVE ALL (${rows.length})` : "SAVE"}</button></div>
+          <div className="flex gap-3"><button type="button" onClick={onClose} disabled={loading} className="retro-btn-secondary flex-1 font-mono-retro text-xs">CANCEL</button><button type="submit" disabled={loading || rows.some(row => moneyNoteCapacity(row.note, row.source) < 0)} className="retro-btn flex-1 font-mono-retro text-xs">{loading ? "SAVING..." : editingExpense ? "UPDATE" : batch ? `SAVE ALL (${rows.length})` : "SAVE"}</button></div>
         </div>
       </form>
     </motion.div>
