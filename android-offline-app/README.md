@@ -1,73 +1,90 @@
-﻿# EXPTRACK for Android
+# EXPTRACK — developer guide
 
-Expense tracker packaged with Capacitor. Android saves expenses and categories in private SQLite storage and syncs them with https://expense-track-lovat.vercel.app through MongoDB Atlas. Screens, scripts, icons, and fonts are bundled in the APK. Expense tracking works offline after login; queued changes upload when the app reconnects or reopens online.
+**[Download the latest Android app — v1.11.3](https://github.com/fakhrul62/expense-track/raw/refs/heads/main/android-offline-app/dist/EXPTRACK-1.11.3.apk)** · [Web app](https://expense-track-lovat.vercel.app) · [Project overview](https://github.com/fakhrul62/expense-track#readme)
 
-## Install
+EXPTRACK combines a Next.js web application and account/sync API with a Capacitor Android app. Android entries use private SQLite storage; the browser uses IndexedDB. Both sync an account's ledger through MongoDB Atlas.
 
-Copy `dist/EXPTRACK-1.11.3.apk` to your phone and open it. Allow installation from your file manager if Android requests it. Install over the previous version to retain your local records.
+This folder is the maintained application and the Vercel project root. From a repository clone, run the commands below inside `android-offline-app`.
 
-Requires Android 7.0 (API 24) or newer and Android System WebView/Chrome 111 or newer. An outdated WebView shows an update instruction screen. Broad compatibility is targeted; performance on every Android device has not been verified.
+## Local web development
 
-Account profiles and bcrypt password hashes are stored in Atlas expense_tracker.users. Opaque server sessions are hashed in auth_sessions. Synced expenses and categories restore after signing into the same account. Uninstalling or clearing app data loses changes that have not synced. Installing a newer APK signed with the same key preserves local records.
+Prerequisites: Node.js 24, npm and a MongoDB connection.
 
-## Version 1.11.3
+```bash
+npm ci
+cp .env.example .env.local
+```
 
-- Loans offer Borrowed and Lent, with Cash Balance or Bank Balance as the source/destination. Debt and receivables have separate totals; installment/full collections, repayments and confirmed deletion retain their wallet effects.
-- Config opens on Updates, followed by Appearance, Reminders, Account and Categories tabs. A subtle Config badge signals a confirmed newer Android release. Quiet checks run on startup/resume/reconnection with an hourly cooldown; downloading and installation remain explicit.
-- QC fixes protect income/expense category identity, recover orphaned loan payments into editable standalone entries, harden CSV export, improve modal focus and report contrast, and group loan payments efficiently. Patched dependencies and regression tests are included.
+Configure these server environment variables:
 
-## Features
+| Variable | Purpose |
+| --- | --- |
+| `MONGODB_URI` | Database connection for accounts, sessions and synced ledger records. |
+| `GOOGLE_CLIENT_ID` | Web OAuth client ID used to verify Google sign-in. Required for the Google sign-in option. |
 
-- Add money: Salary, Bank Balance, Owed money repaid, Freelance and Other. Choose bank/card or cash as the destination. Record borrowing on Loans rather than Add Money.
-- Separate bank/card and cash balances carry across months. Expenses default to cash; each entry can choose its source. Future entries are shown in their month but excluded from current balances and actual spending totals. Loans support partial/full payments and confirmed deletion; existing debt can be tracked without changing money balances.
-- Income uses reserved stable category identities in the existing transactional SQLite/IndexedDB storage and cloud outbox. No destructive database migration is needed. Update all Android installations to 1.11.3 for consistent wallet display and decoded payment-source notes.
-- Live interface preview: run npm run dev -- --port 3005 and open http://localhost:3005.
+Never commit `.env.local` or expose database credentials through `NEXT_PUBLIC_*` variables. Follow [Google setup](GOOGLE-SETUP.md) for the Android package and signing-certificate requirements.
 
-- Create, edit, delete, and browse expenses by month.
-- Sign in or sign up with Google, or use email and password. Native Google sign-in requires Google Play services.
-- Automatic account-specific app/site sync, including edits and deletions. Offline changes persist across restarts. Sync runs while the app is open, on reconnect/resume, and every 30 seconds while visible; Settings also provides Sync now. Closed-app background uploads are not scheduled. For simultaneous edits, the last change received by the server wins.
-- Show/hide the password on sign-in and registration.
-- Switch daily entries between list and grid; the selected view stays saved on this device.
-- Android spending reminders at 1–6 user-selected daily times, scheduled offline (8:30 PM by default). Allow notifications after signing in; configure times or turn reminders off in Config. Signing out cancels it. Android battery restrictions can delay delivery. Background reminders are not available in the browser preview.
-- Today's total follows the device's local date, independent of the selected month.
-- Amounts are stored as integer cents in SQLite.
-- Default and custom categories, with protection against deleting categories in use.
-- Persistent light/dark appearance, Android back handling, keyboard resize, and system-bar insets.
-- Indexed database reads and batches of 60 rendered expense rows.
+```bash
+npm run dev
+```
 
-## Build
+Open [localhost:3000](http://localhost:3000). The local browser app uses the local API; the packaged Android app targets the configured production API. Review `src/lib/account-client.ts` and `src/context/SyncContext.tsx` before distributing a fork with another backend.
 
-Use Node.js, JDK 21, Android SDK platform 36, and build-tools 36.0.0. Set `JAVA_HOME` and `ANDROID_HOME`, then run:
+## Build Android
+
+The provided build script uses Windows PowerShell. Install JDK 21, Android SDK platform 36 and build-tools 36.0.0, then set `JAVA_HOME` and `ANDROID_HOME`.
 
 ```powershell
 npm ci
 npm run android:build
 ```
 
-The build script creates and verifies a signed release APK in `dist/`. Keep `.keys/exptrack-release.jks` and `.keys/release.json` safe: future updates require the same signing key. Both are excluded from Git. The debug build uses a separate application ID ending in `.debug`.
+The script exports the mobile interface, syncs Capacitor, builds Android and verifies signing/alignment. Output goes to `dist/EXPTRACK-<version>.apk`, with a `.sha256` file and an updated `android-update.json` descriptor.
 
-## Local development and checks
+Preserve `.keys/exptrack-release.jks` and `.keys/release.json`: compatible updates require the same signing key. These files are excluded from Git. Debug builds use the separate `com.fakhrul.exptrack.debug` application ID.
 
-```powershell
-npm run dev
-npm run lint
+Runtime requirements are Android 7.0/API 24 or newer and Android System WebView/Chrome 111 or newer. Native Google sign-in requires Google Play services. These are compatibility targets; the [validation record](VALIDATION-1.11.3.md) documents actual test coverage and limits.
+
+## Checks
+
+```bash
+npm test
 npm run typecheck
+npx eslint src
 npm run build
-npm start
-# In another terminal:
-npm run check:accounts
 ```
 
-The browser preview uses IndexedDB; Android uses SQLite through `ExpenseStorePlugin.java`. The preview server is for development, not an installed offline browser app.
+`npm test` covers wallet/report calculations, financial edge cases, Google-token verification and update-version eligibility. Browser journeys and Android WebView checks live in `scripts/`; read each script's server/device requirements before running it.
 
-`scripts/check-offline.mjs --native` runs the same workflows through an Android debug WebView forwarded to port 9222. Set `ANDROID_HOME` for back-button checks. Run it only on a fresh test installation. Results and screenshots go to `test-results/`.
+Real API integration checks require the local environment and a running API:
 
-The account API is in src/app/api/auth/[action]/route.ts; cloud sync is in src/app/api/sync/route.ts. Configure MONGODB_URI and GOOGLE_CLIENT_ID on the server. Android credentials use Keystore-backed AES-GCM storage; browser authentication uses an HTTP-only cookie. Sessions last 30 days. The first signed-in account keeps the pre-login local expenses; other accounts receive separate local databases. Sign-out preserves records for returning accounts. Existing SQLite and IndexedDB databases migrate their records into the durable sync queue. The web and mobile builds are separate: mobile export stages source without server routes. Original server routes and login screens are preserved in `archive/` for reference and excluded from the Android export.
+```bash
+npm run test:sync
+```
 
-Google configuration is documented in GOOGLE-SETUP.md. Current release evidence is in VALIDATION-1.11.3.md; Google sign-in limitations are documented in VALIDATION-1.3.0.md.
+These checks create temporary accounts and use scoped cleanup. See [QC documentation](docs/qc/) for native SQLite, offline sync, lending, settings and update-indicator evidence.
 
+## Storage and sync
 
-## Version 1.11.0
-Separate bank/card and cash wallets use versioned source tags in ledger notes, so existing SQLite/IndexedDB schemas and older sync servers retain the tag without lossy field stripping. Legacy Bank Balance entries map to bank and other untagged entries map to cash. New spending defaults to cash; edits preserve source. Loan cash movements also carry their source. Main totals show spending only.
+- Android uses private SQLite storage; browser entry uses IndexedDB. Offline mutations are queued durably for the signed-in account.
+- Cloud sync runs while the app is open, on reconnect/resume, and periodically while visible. It does not schedule uploads while the app is closed.
+- Use the same account on Android and web to access synced data. **Config → Account** includes cloud sync status and a manual sync action.
+- Signing out preserves local account records and cancels reminders. Uninstalling or clearing app data can remove unsynced changes.
+- Concurrent edits to the same entry use the last change received by the server. Loan deletion and late-payment recovery have dedicated regression checks.
+- Passwords are hashed with bcrypt. Browser sessions use HTTP-only cookies; Android session credentials use Keystore-backed encrypted storage.
 
-Reports supports daily, Monday–Sunday weeks, monthly and custom dates, with CSV and native Android document saving/print-to-PDF. Config appearance presets pair bundled fonts with colors and card styles. See VALIDATION-1.11.0.md for checks and known compatibility limits.
+## Deployment and updates
+
+Configure Vercel's **Root Directory** as `android-offline-app`, set the server environment variables, and build with `npm run build`.
+
+Android update checks read the public GitHub descriptor. A Config badge indicates a confirmed newer release; downloads and installation remain user-controlled. Publish the matching source, descriptor, signed APK and checksum together. See [the update and publishing guide](UPDATES.md).
+
+Update the download links in both repository READMEs when publishing a new APK. Keep previous versioned artifacts unchanged.
+
+## Release information
+
+Current documented release: **v1.11.3 · Android code 21**.
+
+It includes separate bank/cash wallets, Borrowed/Lent flows, installment collections and repayments, reports and exports, configurable reminders, coordinated themes/fonts, grouped settings, an update badge and the financial QC fixes.
+
+[Release validation](VALIDATION-1.11.3.md) · [QC findings and fixes](docs/qc/) · [Google sign-in setup](GOOGLE-SETUP.md)
