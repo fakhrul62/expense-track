@@ -1,58 +1,104 @@
-# EXPTRACK
+<p align="center">
+  <img src="docs/readme/exptrack-cover.png" alt="EXPTRACK — Every taka. Accounted for. Cash, bank, spending and loans for Android and web." width="100%">
+</p>
 
-Personal finance for Android and the web. Track everyday spending, manage cash and bank balances, and keep borrowing and lending clear—all in a focused interface with a distinctive retro style.
+<p align="center">
+  <a href="https://github.com/fakhrul62/expense-track/raw/refs/heads/main/android-offline-app/dist/EXPTRACK-1.11.3.apk"><img src="docs/readme/download-android.png" alt="Download latest Android app" width="340"></a>
+  <a href="https://expense-track-lovat.vercel.app"><img src="docs/readme/open-web.png" alt="Open the web app" width="280"></a>
+</p>
 
-**[Download the latest Android app — v1.11.3](https://github.com/fakhrul62/expense-track/raw/refs/heads/main/android-offline-app/dist/EXPTRACK-1.11.3.apk)**
+<p align="center">
+  <strong>v1.11.3</strong> · Android 7.0+ · System WebView 111+<br>
+  <a href="#get-started">Installation</a> · <a href="android-offline-app/VALIDATION-1.11.3.md">Release notes</a> · <a href="android-offline-app/README.md">Developer guide</a>
+</p>
 
-[Open the web app](https://expense-track-lovat.vercel.app) · [Installation](#install-on-android) · [Developer guide](android-offline-app/README.md) · [Release notes and validation](android-offline-app/VALIDATION-1.11.3.md)
+---
 
-Android 7.0+ · Android System WebView 111+ · Direct APK installation
+## A little order for everyday money.
 
-## Your money, in one place
+Salary arrives. Groceries happen. A friend pays back part of a loan. **EXPTRACK keeps the record** with separate cash and bank balances, quick expense entry and reports you can actually read.
 
-EXPTRACK helps you answer three everyday questions: where your money went, how much you have in each balance, and what you owe or are owed. Use the Android app for offline entry and the website to access the same synced account.
+Cream paper, bold borders, orange controls and hard shadows give it its retro character. Choose a different theme and font in Config to make it yours.
 
-| Feature | What you can do |
-| --- | --- |
-| **Cash and bank balances** | See separate balances. Choose where income arrives and which balance pays an expense; expenses default to cash. |
-| **Income and expenses** | Add income, record multiple expenses together, edit mistakes, and browse daily entries in list or grid view. |
-| **Loans and receivables** | Record money borrowed or lent. Select Cash Balance or Bank Balance, track installments, clear a loan, and delete mistaken records. |
-| **Reports** | Compare income and expenses by day, week, month or custom dates. View charts and category breakdowns; export CSV or print/save a PDF. |
-| **Spending reminders** | Set one to six daily reminder times on Android. |
-| **Personal appearance** | Choose coordinated themes and fonts, with light and dark modes. |
-| **App updates** | See a subtle badge on Config when a newer Android version is available, then choose when to download and install it. |
+<table>
+<tr>
+<td width="50%" valign="top">
 
-Borrowing and lending totals stay separate from available money. Actual money received, lent, repaid or collected changes the selected cash or bank balance. Existing debts and receivables can be recorded without counting an old money movement again.
+### `+` MONEY IN
 
-## Install on Android
+Record salary, freelance income and other money received. Choose **Cash** or **Bank** to keep each balance clear.
 
-1. [Download EXPTRACK v1.11.3](https://github.com/fakhrul62/expense-track/raw/refs/heads/main/android-offline-app/dist/EXPTRACK-1.11.3.apk).
-2. Open the APK on your phone. If prompted, allow installation from the browser or file manager you used.
-3. Sign in with Google or create an email/password account.
+</td>
+<td width="50%" valign="top">
 
-Install updates over your existing app to retain local records. Future updates are available in **Config → Updates**, with Android asking for installation approval.
+### `−` MONEY OUT
 
-Google sign-in on Android requires Google Play services. See the [APK checksum](android-offline-app/dist/EXPTRACK-1.11.3.apk.sha256) and [update details](android-offline-app/UPDATES.md).
+Add one expense or a whole batch. Choose the payment source, then browse entries as a **list or grid**.
 
-## Offline entry and account sync
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
 
-After signing in, the Android app stores entries in private SQLite storage and works offline. Pending changes sync with your account when the app is open and connected, including after reconnecting or resuming. Sign in with the same account on the website to see synced records.
+### `↔` BORROW & LEND
 
-Keep unsynced entries on the device: uninstalling the app or clearing its data can remove changes that have not reached the server. Closed-app background uploads are not scheduled. [More about storage and sync](android-offline-app/README.md#storage-and-sync).
+Track **I Owe** and **Owed to Me**, including installments, full settlements and mistaken-entry deletion.
 
-## Built with
+</td>
+<td width="50%" valign="top">
 
-| Layer | Technology |
-| --- | --- |
-| Web interface and API | Next.js 16, React 19, TypeScript |
-| Styling and interaction | Tailwind CSS 4, Framer Motion, Lucide |
-| Android application | Capacitor 8, native Android integrations, SQLite |
-| Browser storage | IndexedDB |
-| Cloud data | MongoDB Atlas, accessed through Mongoose's database connection |
-| Sign-in | Google or email/password; server-managed sessions and bcrypt password hashing |
-| Web hosting | Vercel |
+### `▥` SEE THE PATTERN
 
-## Run the web app locally
+Compare income and expenses by **day, week, month or custom dates**. Explore charts and categories, export CSV or print to PDF.
+
+</td>
+</tr>
+</table>
+
+### Small details. Everyday convenience.
+
+- **Offline on Android** — record entries locally and sync when connected.
+- **Your account, both screens** — Google or email sign-in across Android and web.
+- **Reminders on your schedule** — choose one to six daily notification times.
+- **Make it comfortable** — coordinated themes, font choices, light and dark modes.
+- **Updates within reach** — a subtle Config badge signals a newer app version. The updater is the first settings tab.
+
+## Get started
+
+**1 · Download** the latest APK using the orange button above.
+
+**2 · Install** it on your Android phone. Allow installation from your browser or file manager when Android prompts you.
+
+**3 · Sign in** with Google or create an email/password account, then add your first income or expense.
+
+Google sign-in on Android requires Google Play services. Install updates over your existing app to retain local records. Future releases are available through **Config → Updates**. [APK checksum](android-offline-app/dist/EXPTRACK-1.11.3.apk.sha256) · [Update guide](android-offline-app/UPDATES.md)
+
+<details>
+<summary><strong>How balances, loans and sync work</strong></summary>
+
+### Cash and bank
+
+Income adds to its selected balance. Expenses deduct from their selected balance and default to cash.
+
+### Borrowing and lending
+
+Money borrowed adds to the selected balance. Money lent or repaid reduces it. Collections add money back. Outstanding debt and receivables are tracked separately. Existing obligations can be recorded without counting a historical money movement again.
+
+### Offline and sync
+
+After sign-in, Android stores entries in private SQLite storage. Pending changes sync while the app is open and connected, including after reconnecting or resuming. Use the same account on the website to see synced records.
+
+Keep the app installed until pending entries finish syncing. Clearing app data or uninstalling can remove unsynced records. Background uploads require the app to resume. [Storage and sync details](android-offline-app/README.md#storage-and-sync)
+
+</details>
+
+<details>
+<summary><strong>Under the hood · stack, setup & repository</strong></summary>
+
+**Next.js 16 / React 19 / TypeScript / Tailwind CSS 4**<br>
+**Capacitor 8 / SQLite / IndexedDB / MongoDB Atlas / Vercel**
+
+### Local development
 
 Use Node.js 24 and npm, plus a MongoDB connection for the account and sync API.
 
@@ -71,7 +117,7 @@ npm run dev
 
 Open [localhost:3000](http://localhost:3000). For Android builds, signing, tests and deployment settings, use the [developer guide](android-offline-app/README.md).
 
-## Repository guide
+### Repository layout
 
 The maintained Android app, web app and API are in **[`android-offline-app/`](android-offline-app/)**. Vercel uses this folder as its project root.
 
@@ -83,4 +129,13 @@ The maintained Android app, web app and API are in **[`android-offline-app/`](an
 
 Earlier website files are retained at the repository root. Start in `android-offline-app` for current development.
 
-Maintained by [Md. Fakhrul Alam Shuvo](https://github.com/fakhrul62).
+
+</details>
+
+---
+
+<p align="center">
+  <strong>EXPTRACK</strong><br>
+  Built by <a href="https://github.com/fakhrul62">Md. Fakhrul Alam Shuvo</a><br>
+  <a href="https://github.com/fakhrul62/expense-track/issues">Report an issue</a> · <a href="android-offline-app/README.md">Build it yourself</a>
+</p>
